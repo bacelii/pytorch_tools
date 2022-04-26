@@ -115,7 +115,8 @@ def metric_dict(
     y_true:torch.Tensor,
     y_pred:torch.Tensor,
     tensor_map=None,
-    verbose = True
+    verbose = True,
+    metrics = None
     ):
     
     if verbose:
@@ -132,6 +133,8 @@ def metric_dict(
         recall=evu.recall(y_true,y_pred,tensor_map=tensor_map),
         f1=evu.recall(y_true,y_pred,tensor_map=tensor_map)
     )
+    if metrics is not None:
+        evaluation_metrics = {k:v for k,v in evaluation_metrics.items() if k in metrics}
     return  evaluation_metrics
 
 import evaluation_utils as evu

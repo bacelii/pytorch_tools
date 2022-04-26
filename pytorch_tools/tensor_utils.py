@@ -9,3 +9,6 @@ def map_tensor_with_tensor(tensor,tensor_map):
     
 def cat(tensors,dim = None,**kwargs):
     return torch.cat(tensors,dim=dim,**kwargs)
+
+def numpy_array(tensor):
+    return tensor.cpu().detach().numpy()
