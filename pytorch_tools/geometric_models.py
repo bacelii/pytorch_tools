@@ -485,6 +485,176 @@ class DiffPoolSAGE(nn.Module):
 
         return loss
     
+# --------------------- TREE LSTM MODEL ------------------------
+"""
+Tutorial: https://docs.dgl.ai/en/0.6.x/tutorials/models/2_small_graph/3_tree-lstm.html 
+
+Code: https://github.com/dmlc/dgl/blob/master/examples/pytorch/tree_lstm/tree_lstm.py
+
+Improved Semantic Representations From Tree-Structured Long Short-Term Memory Networks
+https://arxiv.org/abs/1503.00075
+"""
+    
+import torch as th
+import torch.nn as nn
+from collections import namedtuple
+import dgl
+
+class ChildSumTreeLSTMCell(nn.Module):
+    def __init__(self, x_size, h_size):
+        super(ChildSumTreeLSTMCell, self).__init__()
+        self.W_iou = nn.Linear(x_size, 3 * h_size, bias=False)
+        self.U_iou = nn.Linear(h_size, 3 * h_size, bias=False)
+        self.b_iou = nn.Parameter(th.zeros(1, 3 * h_size))
+        self.U_f = nn.Linear(h_size, h_size)
+
+    def message_func(self, edges):
+        return {'h': edges.src['h'], 'c': edges.src['c']}
+
+    def reduce_func(self, nodes):
+        h_tild = th.sum(nodes.mailbox['h'], 1)
+        f = th.sigmoid(self.U_f(nodes.mailbox['h']))
+        c = th.sum(f * nodes.mailbox['c'], 1)
+        return {'iou': self.U_iou(h_tild), 'c': c}
+
+    def apply_node_func(self, nodes):
+        iou = nodes.data['iou'] + self.b_iou
+        i, o, u = th.chunk(iou, 3, 1)
+        i, o, u = th.sigmoid(i), th.sigmoid(o), th.tanh(u)
+        c = i * u + nodes.data['c']
+        h = o * th.tanh(c)
+        return {'h': h, 'c': c}
+
+class TreeLSTMCell(nn.Module):
+    def __init__(self, x_size, h_size):
+        super(TreeLSTMCell, self).__init__()
+        self.W_iou = nn.Linear(x_size, 3 * h_size, bias=False)
+        self.U_iou = nn.Linear(2 * h_size, 3 * h_size, bias=False)
+        self.b_iou = nn.Parameter(th.zeros(1, 3 * h_size))
+        self.U_f = nn.Linear(2 * h_size, 2 * h_size)
+
+    def message_func(self, edges):
+        return {'h': edges.src['h'], 'c': edges.src['c']}
+
+    def reduce_func(self, nodes):
+        h_cat = nodes.mailbox['h'].view(nodes.mailbox['h'].size(0), -1)
+        f = th.sigmoid(self.U_f(h_cat)).view(*nodes.mailbox['h'].size())
+        c = th.sum(f * nodes.mailbox['c'], 1)
+        return {'iou': self.U_iou(h_cat), 'c': c}
+
+    def apply_node_func(self, nodes):
+        iou = nodes.data['iou'] + self.b_iou
+        i, o, u = th.chunk(iou, 3, 1)
+        i, o, u = th.sigmoid(i), th.sigmoid(o), th.tanh(u)
+        c = i * u + nodes.data['c']
+        h = o * th.tanh(c)
+        return {'h' : h, 'c' : c}
+
+import dgl.function as fn
+import torch as th
+import dgl_utils as dglu
+
+class TreeLSTM(nn.Module):
+    def __init__(
+        self,
+        #num_vocabs,
+        dataset_num_node_features,
+        dataset_num_classes,
+        #h_size,
+        n_hidden_channels=64,
+        dropout=0.5,
+        cell_type = "nary",
+        global_pool_type = "mean"
+        ):
+        
+        super(TreeLSTM, self).__init__()
+        #self.x_size = x_size
+        #self.embedding = nn.Embedding(num_vocabs, x_size)
+#         if pretrained_emb is not None:
+#             print('Using glove')
+#             self.embedding.weight.data.copy_(pretrained_emb)
+#             self.embedding.weight.requires_grad = True
+        self.dropout = nn.Dropout(dropout)
+        self.linear = nn.Linear(
+            n_hidden_channels, 
+            dataset_num_classes)
+        
+        cell = TreeLSTMCell if cell_type == 'nary' else ChildSumTreeLSTMCell
+        self.cell = cell(
+            dataset_num_node_features,
+            n_hidden_channels)
+        
+        if global_pool_type is not None:
+            self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+        else:
+            self.global_pool_func = None
+            
+
+    def encode(
+        self,
+        batch,
+        h,
+        c,
+        embeddings):
+        
+        """Compute tree-lstm prediction given a batch.
+
+        Parameters
+        ----------
+        batch : dgl.data.SSTBatch
+            The data batch.
+        h : Tensor
+            Initial hidden state.
+        c : Tensor
+            Initial cell state.
+
+        Returns
+        -------
+        logits : Tensor
+            The prediction of each node.
+        """
+        # to heterogenous graph
+        g = dglu.g_from_data(batch)
+        
+        #print(f"g = {g}")
+        
+#         print(f"g.edges = {g.edges()}")
+#         print(f"list(dgl.topological_nodes_generator(g)) = {list(dgl.topological_nodes_generator(g))}")
+        # feed embedding
+        #embeds = self.embedding(batch.wordid * batch.mask)
+        g.ndata['iou'] = self.cell.W_iou(
+            self.dropout(embeddings),
+            #embeddings
+        )# * batch.mask.float().unsqueeze(-1)
+        g.ndata['h'] = h
+        g.ndata['c'] = c
+        # propagate
+        dgl.prop_nodes_topo(g,
+                            message_func=self.cell.message_func,
+                            reduce_func=self.cell.reduce_func,
+                            apply_node_func=self.cell.apply_node_func)
+        # compute logits
+        h = self.dropout(g.ndata.pop('h'))
+        if self.global_pool_func is not None:
+            h = self.global_pool_func(h, batch.batch)
+        return h
+        
+    def forward(
+        self,
+        batch,
+        h,
+        c,
+        embeddings):
+        
+        h = self.encode(
+        batch=batch,
+        h=h,
+        c=c,
+        embeddings=embeddings)
+        
+        logits = self.linear(h)
+        return F.softmax(logits, dim=-1)
+    
 # ------------- Models that did not work ------------
 """
 import geometric_models as gm
