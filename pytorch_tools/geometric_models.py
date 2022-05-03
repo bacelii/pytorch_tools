@@ -112,7 +112,24 @@ class GAT(nn.Module):
         x = self.encode(data)
         return F.softmax(x,dim=1)
     
+# --------------------- ALL OF THE DIFFPOOL MODELS -------------
+class Classifier(nn.Module):
+    def __init__(
+        self,
+        n_classes,
+        n_inputs,
+        n_hidden = 50,
+        activation_function = "ReLU",
+        ):
+        super().__init__()
+        self.act_func = activation_function
+        self.classifier = nn.Sequential(nn.Linear(n_inputs, n_hidden),
+                                        getattr(nn,self.act_func)(),
+                                        nn.Linear(n_hidden, n_classes))
 
+    def forward(self, x):
+        return self.classifier(x)
+    
 # ---- simple diff pool -------------
 """
 Source: https://github.com/AntonioLonga/PytorchGeometricTutorial/blob/main/Tutorial16/Tutorial16.ipynb
@@ -178,52 +195,85 @@ class DiffPoolSimple(torch.nn.Module):
         dataset_num_classes,
         n_hidden_channels=64, 
         max_nodes=150,
+        pool_ratio = 0.25,
+        n_pool_layers = 2,
+        
+        #classifier arguments
+        classifier_n_hidden = 50,
+        
         ):
         super(DiffPoolSimple, self).__init__()
 
 #         if max_nodes > dataset_num_node_features:
 #             max_nodes = dataset_num_node_features
         
-        num_nodes = ceil(0.25 * max_nodes)
+        num_nodes = ceil(pool_ratio * max_nodes)
+        if num_nodes < 1:
+            num_nodes = 1
         
-        self.gnn1_pool = DiffPoolSimpleGNN(dataset_num_node_features, n_hidden_channels, num_nodes)
-        self.gnn1_embed = DiffPoolSimpleGNN(dataset_num_node_features, n_hidden_channels, n_hidden_channels)
+        self.n_nodes_by_layer = [dataset_num_node_features]
+        self.n_pool_layers = n_pool_layers
+        
+        for i in range(n_pool_layers):
+            self.n_nodes_by_layer.append(num_nodes)
+            if i == 0:
+                input_size = dataset_num_node_features
+            else:
+                input_size = n_hidden_channels
+                
+            #self.gnn1_pool = DiffPoolSimpleGNN(dataset_num_node_features, n_hidden_channels, num_nodes)
+            setattr(self,f"gnn{i}_pool",DiffPoolSimpleGNN(input_size, n_hidden_channels, num_nodes))
+            #self.gnn1_embed = DiffPoolSimpleGNN(dataset_num_node_features, n_hidden_channels, n_hidden_channels)
+            setattr(self,f"gnn{i}_embed",DiffPoolSimpleGNN(input_size, n_hidden_channels, n_hidden_channels))
 
-        num_nodes = ceil(0.25 * num_nodes)
-        self.gnn2_pool = DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, num_nodes)
-        self.gnn2_embed = DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, n_hidden_channels, lin=False)
+            num_nodes = ceil(pool_ratio * num_nodes)
+            if num_nodes < 1:
+                num_nodes = 1
+    
+                    
+        #self.gnn3_embed = DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, n_hidden_channels, lin=False)
+        setattr(self,f"gnn{n_pool_layers}_embed",DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, n_hidden_channels, lin=False))
+        
+        self.classifier = Classifier(
+            n_classes = dataset_num_classes,
+            n_inputs = n_hidden_channels,
+            n_hidden = classifier_n_hidden,
+        )
 
-        self.gnn3_embed = DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, n_hidden_channels, lin=False)
-
-        self.lin1 = torch.nn.Linear(n_hidden_channels, n_hidden_channels)
-        self.lin2 = torch.nn.Linear(n_hidden_channels, dataset_num_classes)
+#         self.lin1 = torch.nn.Linear(n_hidden_channels, n_hidden_channels)
+#         self.lin2 = torch.nn.Linear(n_hidden_channels, dataset_num_classes)
 
         
     def encode(self,data,return_loss = True):
         x,adj,mask = data.x, data.adj, data.mask
-        s = self.gnn1_pool(x, adj, mask)
-        x = self.gnn1_embed(x, adj, mask)
+        
+        gnn_loss = []
+        cluster_loss = []
+        for i in range(self.n_pool_layers):
+            if i > 0:
+                mask = None
+                
+            #s = self.gnn1_pool(x, adj, mask)
+            s = getattr(self,f"gnn{i}_pool")(x, adj, mask)
+            #x = self.gnn1_embed(x, adj, mask)
+            x = getattr(self,f"gnn{i}_embed")(x, adj, mask)
 
-        x, adj, l1, e1 = dense_diff_pool(x, adj, s, mask)
+            x, adj, l1, e1 = dense_diff_pool(x, adj, s, mask)
+            gnn_loss.append(l1)
+            cluster_loss.append(e1)
         #x_1 = s_0.t() @ z_0
         #adj_1 = s_0.t() @ adj_0 @ s_0
-        
-        s = self.gnn2_pool(x, adj)
-        x = self.gnn2_embed(x, adj)
 
-        x, adj, l2, e2 = dense_diff_pool(x, adj, s)
-
-        x = self.gnn3_embed(x, adj)
+        x = getattr(self,f"gnn{self.n_pool_layers}_embed")(x, adj)
 
         x = x.mean(dim=1)
         if return_loss:
-            return x,l1+l2,e1+e2
+            return x,np.sum(gnn_loss),np.sum(cluster_loss)
         else:
             return x
     def forward(self,data):
         x,gnn_loss,cluster_loss = self.encode(data,return_loss = True)
-        x = F.relu(self.lin1(x))
-        x = self.lin2(x)
+        x = self.classifier(x) 
         return F.softmax(x, dim=-1), gnn_loss, cluster_loss
     
     
@@ -235,7 +285,15 @@ pyg implementation paper source = https://github.com/VoVAllen/diffpool
 """
 
 class BatchedGraphSAGE(nn.Module):
-    def __init__(self, infeat, outfeat, device='cpu', use_bn=True, mean=False, add_self=False):
+    def __init__(
+        self, 
+        infeat, 
+        outfeat,
+        device='cpu',
+        use_bn=True, 
+        mean=False, 
+        add_self=False):
+        
         super().__init__()
         self.add_self = add_self
         self.use_bn = use_bn
@@ -244,7 +302,14 @@ class BatchedGraphSAGE(nn.Module):
         self.W = nn.Linear(infeat, outfeat, bias=True)
         nn.init.xavier_uniform_(self.W.weight, gain=nn.init.calculate_gain('relu'))
 
-    def forward(self, x, adj, mask=None):
+    def forward(
+        self,
+        #data
+        x,
+        adj,
+        mask = None,
+        ):
+        #x,adj,mask = data.x, data.adj, data.mask
         if self.add_self:
             adj = adj + torch.eye(adj.size(0)).to(self.device)
 
@@ -264,7 +329,15 @@ class BatchedGraphSAGE(nn.Module):
 
 
 class BatchedDiffPool(nn.Module):
-    def __init__(self, nfeat, nnext, nhid, is_final=False, device='cpu', link_pred=False):
+    def __init__(
+        self, 
+        nfeat, 
+        nnext, 
+        nhid, 
+        is_final=False,
+        device='cpu', 
+        link_pred=False):
+        
         super(BatchedDiffPool, self).__init__()
         self.link_pred = link_pred
         self.device = device
@@ -275,9 +348,33 @@ class BatchedDiffPool(nn.Module):
         self.link_pred_loss = 0
         self.entropy_loss = 0
 
-    def forward(self, x, adj, mask=None, log=False):
+    def encode(
+        self,
+        x,
+        adj,
+        mask = None,):
+        #x,adj,mask = data.x, data.adj, data.mask
         z_l = self.embed(x, adj)
+        return z_l
+    def cluster(
+        self,
+        x,
+        adj,
+        mask = None,):
+        #x,adj,mask = data.x, data.adj, data.mask
         s_l = F.softmax(self.assign_mat(x, adj), dim=-1)
+        return s_l
+        
+    def forward(
+        self,
+        #data,
+        x,
+        adj,
+        mask = None,
+        log=False):
+        
+        z_l = self.encode(x,adj,mask)
+        s_l = self.cluster(x,adj,mask)
         if log:
             self.log['s'] = s_l.cpu().numpy()
         xnext = torch.matmul(s_l.transpose(-1, -2), z_l)
@@ -290,6 +387,103 @@ class BatchedDiffPool(nn.Module):
                 self.entropy_loss = self.entropy_loss * mask.expand_as(self.entropy_loss)
             self.entropy_loss = self.entropy_loss.sum(-1)
         return xnext, anext
+    
+    
+class DiffPoolSAGE(nn.Module):
+    def __init__(
+        self,
+        dataset_num_node_features, 
+        dataset_num_classes,
+        n_hidden_channels=64, 
+        max_nodes=150,
+        pool_ratio = 0.25,
+        n_pool_layers = 2,
+        device="cpu",
+        link_pred=False,
+        
+        #classifier parameters
+        classifier_n_hidden = 50):
+        
+        super().__init__()
+        self.input_shape = dataset_num_node_features
+        self.link_pred = link_pred
+        self.device = device
+        
+        
+        num_nodes = ceil(pool_ratio * max_nodes)
+        if num_nodes < 1:
+            num_nodes = 1
+            
+        self.n_nodes_by_layer = [dataset_num_node_features]
+        self.n_pool_layers = n_pool_layers
+        
+        layers_list = []
+        for i in range(n_pool_layers):
+            self.n_nodes_by_layer.append(num_nodes)
+            if i == 0:
+                input_size = dataset_num_node_features
+            else:
+                input_size = n_hidden_channels
+            layers_list.append(BatchedGraphSAGE(input_size,n_hidden_channels,device = self.device))
+            layers_list.append(BatchedGraphSAGE(n_hidden_channels,n_hidden_channels,device = self.device))
+            layers_list.append(BatchedDiffPool(n_hidden_channels, num_nodes, n_hidden_channels, device=self.device, link_pred=link_pred))
+            
+            num_nodes = ceil(pool_ratio * num_nodes)
+            if num_nodes < 1:
+                num_nodes = 1
+            
+        layers_list.append(BatchedGraphSAGE(n_hidden_channels,n_hidden_channels,device = self.device))
+        layers_list.append(BatchedGraphSAGE(n_hidden_channels,n_hidden_channels,device = self.device))
+        self.layers = nn.ModuleList(layers_list)
+#         self.layers = nn.ModuleList([
+#             BatchedGraphSAGE(dataset_num_node_features, 30, device=self.device),
+#             BatchedGraphSAGE(30, 30, device=self.device),
+#             BatchedDiffPool(30, pool_size, 30, device=self.device, link_pred=link_pred),
+#             BatchedGraphSAGE(30, 30, device=self.device),
+#             BatchedGraphSAGE(30, 30, device=self.device),
+#             # BatchedDiffPool(30, 1, 30, is_final=True, device=self.device)
+#         ])
+
+        self.classifier = Classifier(
+            n_classes = dataset_num_classes,
+            n_inputs = n_hidden_channels,
+            n_hidden = classifier_n_hidden,
+        )
+        # writer.add_text(str(vars(self)))
+
+    def encode(self,data):
+        x,adj,mask = data.x, data.adj, data.mask
+        for layer in self.layers:
+            if isinstance(layer, BatchedGraphSAGE):
+                if mask.shape[1] == x.shape[1]:
+                    x = layer(x, adj, mask)
+                else:
+                    x = layer(x, adj)
+            elif isinstance(layer, BatchedDiffPool):
+                # TODO: Fix if condition
+                if mask.shape[1] == x.shape[1]:
+                    x, adj = layer(x, adj, mask)
+                else:
+                    x, adj = layer(x, adj)
+
+        # x = x * mask
+        readout_x = x.sum(dim=1)
+        return readout_x
+    def forward(self, data):
+        graph_feat = self.encode(data)
+        output = self.classifier(graph_feat)
+        return F.softmax(output, dim=-1)
+        
+
+    def loss(self, output, labels):
+        criterion = nn.CrossEntropyLoss()
+        loss = criterion(output, labels)
+        if self.link_pred:
+            for layer in self.layers:
+                if isinstance(layer, BatchedDiffPool):
+                    loss = loss + layer.link_pred_loss.mean() + layer.entropy_loss.mean()
+
+        return loss
     
 # ------------- Models that did not work ------------
 """
