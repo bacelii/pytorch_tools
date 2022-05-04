@@ -477,6 +477,7 @@ Note: This requires the data to be a dense matrix
 
 from torch_geometric.nn import DenseGCNConv as DenseGCNConv, dense_diff_pool
 class DiffPoolSimpleGNN(torch.nn.Module):
+    
     def __init__(
         self,
         in_channels,
@@ -519,7 +520,8 @@ class DiffPoolSimpleGNN(torch.nn.Module):
         
         return x
 from math import ceil
-class DiffPoolSimple(torch.nn.Module):
+class DiffPoolGCN(torch.nn.Module):
+    dense_adj = True
     def __init__(
         self,
         dataset_num_node_features, 
@@ -530,11 +532,12 @@ class DiffPoolSimple(torch.nn.Module):
         n_pool_layers = 2,
         
         #classifier arguments
+        classifier_flat = True,
         classifier_n_hidden = 50,
-        global_pool_type="mean"
+        global_pool_type="mean",
         
         ):
-        super(DiffPoolSimple, self).__init__()
+        super(DiffPoolGCN, self).__init__()
         self.global_pool_type = global_pool_type
 #         if max_nodes > dataset_num_node_features:
 #             max_nodes = dataset_num_node_features
@@ -566,7 +569,13 @@ class DiffPoolSimple(torch.nn.Module):
         #self.gnn3_embed = DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, n_hidden_channels, lin=False)
         setattr(self,f"gnn{n_pool_layers}_embed",DiffPoolSimpleGNN(n_hidden_channels, n_hidden_channels, n_hidden_channels, lin=False))
         
-        self.classifier = Classifier(
+        
+        if classifier_flat:
+            classifier_class = ClassifierFlat
+        else:
+            classifier_class = Classifier
+        
+        self.classifier = classifier_class(
             n_classes = dataset_num_classes,
             n_inputs = n_hidden_channels,
             n_hidden = classifier_n_hidden,
@@ -848,6 +857,7 @@ import torch as th
 import dgl_utils as dglu
 
 class TreeLSTM(nn.Module):
+    directed = True
     def __init__(
         self,
         #num_vocabs,
