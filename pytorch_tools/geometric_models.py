@@ -4,6 +4,8 @@ import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
 import numpy as np
+import torch as th
+import torch.nn as nn
 """
 Notes: 
 Usually only have to use the batch variable when doing global pooling
@@ -11,9 +13,66 @@ Usually only have to use the batch variable when doing global pooling
 
 
 """
+class Classifier(nn.Module):
+    def __init__(
+        self,
+        n_classes,
+        n_inputs,
+        n_hidden = None,
+        activation_function = "ReLU",
+        n_hidden_layers = 1,
+        f = True,
+        use_bn = False,
+        ):
+        
+        if n_hidden is None:
+            n_hidden = 50
+        super().__init__()
+        self.act_func = activation_function
+        hid_layers = []
+        if n_hidden_layers==0:
+            hid_layers.append(nn.Linear(n_inputs, n_classes))
+        else:
+            for i in range(n_hidden_layers):
+                if i == 0:
+                    input_stage = n_inputs
+                else:
+                    input_stage= n_hidden
+                hid_layers += [nn.Linear(input_stage, n_hidden)]
+                if use_bn:
+                    hid_layers.append(nn.BatchNorm1d(n_hidden))
+                hid_layers.append(nn.ReLU())
+
+            hid_layers.append(nn.Linear(n_hidden, n_classes))
+        self.classifier = nn.Sequential(*hid_layers
+                                        )
+        self.use_bn = use_bn
+
+    def forward(self, x):
+        return self.classifier(x)
+    
+class ClassifierFlat(nn.Module):
+    def __init__(
+        self,
+        n_classes,
+        n_inputs,
+        dropout = 0.5,
+        **kwargs
+        ):
+        self.lin = Linear(n_inputs, n_classes)
+        self.dropout = dropout
+        
+    def forward(self,x):
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = self.lin(x)
+        return x
+        
+    
+
+
 # ---------------- basic graph neural network models -----------
 # Define our GCN class as a pytorch Module
-class GCN(torch.nn.Module):
+class GCNFlat(torch.nn.Module):
     def __init__(
         self, 
         n_hidden_channels,
@@ -24,7 +83,7 @@ class GCN(torch.nn.Module):
         global_pool_type="mean",
                 ):
         
-        super(GCN, self).__init__()
+        super(GCNFlat, self).__init__()
         # We inherit from pytorch geometric's GCN class, and we initialize three layers
         self.conv0 = GCNConv(dataset_num_node_features, n_hidden_channels)
         for i in range(1,n_layers):
@@ -55,17 +114,179 @@ class GCN(torch.nn.Module):
         return x
     
     def forward(self, data):
-        x = self.embedding(data)
+        x = self.encode(data)
         # 3. Apply a final classifier
         x = F.dropout(x, p=0.5, training=self.training)
         x = self.lin(x)
+        return F.softmax(x,dim=1)
+
+
+
+class GCN(torch.nn.Module):
+    def __init__(
+        self, 
+        n_hidden_channels,
+        dataset_num_node_features,
+        dataset_num_classes,
+        n_layers = 3,
+        
+        global_pool_type="mean",
+        use_bn = True,
+        #for classifier:
+        n_hidden_layers_classifier = 0,
+        activation_function = "relu",
+        
+        
+                ):
+        
+        super(GCN, self).__init__()
+        # We inherit from pytorch geometric's GCN class, and we initialize three layers
+        self.conv0 = GCNConv(dataset_num_node_features, n_hidden_channels)
+        self.bn0 = torch.nn.BatchNorm1d(n_hidden_channels)
+        for i in range(1,n_layers):
+            setattr(self,f"conv{i}",GCNConv(n_hidden_channels, n_hidden_channels))
+            setattr(self,f"bn{i}",torch.nn.BatchNorm1d(n_hidden_channels))
+        self.n_conv = n_layers
+        
+        # Our final linear layer will define our output
+        #self.lin = Linear(n_hidden_channels, dataset_num_classes)
+        self.act_func = getattr(F,activation_function)
+        self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+        self.use_bn = use_bn
+        
+        
+        
+        self.classifier = Classifier(
+            n_classes = dataset_num_classes,
+            n_inputs = n_hidden_channels,
+            n_hidden_layers = n_hidden_layers_classifier,
+            activation_function=activation_function,
+            use_bn=use_bn
+        )
+                
+        
+    def encode(self,data):
+        x, edge_index = data.x, data.edge_index
+        batch = getattr(data,"batch",None)
+        
+        if batch is None:
+            batch = torch.zeros(x.shape[0],dtype=torch.int64)
+        # 1. Obtain node embeddings 
+        for i in range(self.n_conv):
+            x = getattr(self,f"conv{i}")(x, edge_index)
+            if i < self.n_conv-1:
+                x = self.act_func(x)
+                
+            if self.use_bn:
+                setattr(self,f"bn{i}", nn.BatchNorm1d(x.size(1)))#.to(self.device)
+                x = getattr(self,f"bn{i}")(x)
+                    
+        # 2. Readout layer
+        x = self.global_pool_func(x, batch)  # [batch_size, hidden_channels]
+        return x
+    
+    def forward(self, data):
+        x = self.encode(data)
+        x = self.classifier(x)
+#         # 3. Apply a final classifier
+#         x = F.dropout(x, p=0.5, training=self.training)
+#         x = self.lin(x)
         return F.softmax(x,dim=1)
     
     
 # ---------- Graph Attention Network -------------
 from torch_geometric.nn import GATConv
 import torch.nn as nn
+
 class GAT(nn.Module):
+    """
+    Source: https://github.com/marblet/GNN_models_pytorch_geometric/blob/master/models/gat.py
+    """
+    def __init__(
+        self, 
+        dataset_num_node_features, 
+        dataset_num_classes,
+        n_hidden_channels=10, 
+        global_pool_type="mean",
+        n_layers = 2,
+        dropout=0.6,
+        activation_function = "elu",
+        
+        #parameters for the GAT
+        heads=2, 
+        first_heads=None,
+        output_heads=None,
+
+    
+        #--- parameters for size of classifier
+        classifier_flat = False,
+        classifier_n_hidden = None,):
+        super(GAT, self).__init__()
+        
+        if first_heads is not None:
+            conv0_heads = first_heads
+        else:
+            conv0_heads = heads
+        self.conv0 = GATConv(dataset_num_node_features, n_hidden_channels,
+                           heads=conv0_heads, dropout=dropout)
+        
+        self.act_func = getattr(F,activation_function)
+        
+        prev_heads = conv0_heads
+        for i in range(1,n_layers):
+            if output_heads is not None:
+                convN_heads = output_heads
+            else:
+                convN_heads = heads
+            setattr(self,f"conv{i}",GATConv(n_hidden_channels*prev_heads, n_hidden_channels,
+                           heads=convN_heads, dropout=dropout))
+            prev_heads = heads
+            
+        self.dropout = dropout
+        if global_pool_type is not None:
+            self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+        else:
+            self.global_pool_func = None
+            
+        self.n_conv = n_layers
+        
+        if classifier_flat:
+            classifier_class = ClassifierFlat
+        else:
+            classifier_class = Classifier
+            
+        self.classifier = classifier_class(
+            n_classes = dataset_num_classes,
+            n_inputs = n_hidden_channels*heads,
+        )
+
+    def reset_parameters(self):
+        self.gc1.reset_parameters()
+        self.gc2.reset_parameters()
+
+    def encode(self,data):    
+        x, edge_index = data.x, data.edge_index
+        batch = getattr(data,"batch",None)
+        
+        if batch is None:
+            batch = torch.zeros(x.shape[0],dtype=torch.int64)
+            
+        for i in range(self.n_conv):
+            x = F.dropout(x, p=self.dropout, training=self.training)
+            x = getattr(self,f"conv{i}")(x, edge_index)
+            if i < self.n_conv-1:
+                x = self.act_func(x)
+        
+        if self.global_pool_func is not None:
+            x = self.global_pool_func(x, batch)
+        return x
+    def forward(self, data):
+        x = self.encode(data)
+        x = self.classifier(x)
+        return F.softmax(x,dim=1)
+
+
+class GAT_old(nn.Module):
     """
     Source: https://github.com/marblet/GNN_models_pytorch_geometric/blob/master/models/gat.py
     """
@@ -112,23 +333,129 @@ class GAT(nn.Module):
         x = self.encode(data)
         return F.softmax(x,dim=1)
     
-# --------------------- ALL OF THE DIFFPOOL MODELS -------------
-class Classifier(nn.Module):
+    
+class BatchedGraphSAGE(nn.Module):
+    def __init__(
+        self, 
+        infeat, 
+        outfeat,
+        device='cpu',
+        use_bn=True, 
+        mean=False, 
+        add_self=False):
+        
+        super().__init__()
+        self.add_self = add_self
+        self.use_bn = use_bn
+        self.device = device
+        self.mean = mean
+        self.W = nn.Linear(infeat, outfeat, bias=True)
+        nn.init.xavier_uniform_(self.W.weight, gain=nn.init.calculate_gain('relu'))
+
+    def forward(
+        self,
+        #data
+        x,
+        adj,
+        mask = None,
+        ):
+        #x,adj,mask = data.x, data.adj, data.mask
+        if self.add_self:
+            adj = adj + torch.eye(adj.size(0)).to(self.device)
+
+        if self.mean:
+            adj = adj / adj.sum(1, keepdim=True)
+
+        h_k_N = torch.matmul(adj, x)
+        h_k = self.W(h_k_N)
+        h_k = F.normalize(h_k, dim=2, p=2)
+        h_k = F.relu(h_k)
+        if self.use_bn:
+            self.bn = nn.BatchNorm1d(h_k.size(1)).to(self.device)
+            h_k = self.bn(h_k)
+        if mask is not None:
+            h_k = h_k * mask.unsqueeze(2).expand_as(h_k)
+        return h_k
+    
+    
+class GraphSAGE(nn.Module):
+    dense_adj = True
+    
     def __init__(
         self,
-        n_classes,
-        n_inputs,
-        n_hidden = 50,
-        activation_function = "ReLU",
+        dataset_num_node_features, 
+        dataset_num_classes,
+        n_layers = 2,
+        n_hidden_channels=8, 
+        #dropout=0.6,
+        global_pool_type="mean",
+        
+        
+        #parameters for the individual GraphSAGEs
+        device = "cpu",
+        use_bn=False, 
+        mean=False, 
+        add_self=False,
+        
+        #--- parameters for size of classifier
+        classifier_n_hidden = None,
         ):
-        super().__init__()
-        self.act_func = activation_function
-        self.classifier = nn.Sequential(nn.Linear(n_inputs, n_hidden),
-                                        getattr(nn,self.act_func)(),
-                                        nn.Linear(n_hidden, n_classes))
+        
+        super(GraphSAGE, self).__init__()
+        
+        self.conv0 = BatchedGraphSAGE(
+            dataset_num_node_features,
+            n_hidden_channels,
+            device = device,
+            use_bn=use_bn, 
+            mean=mean, 
+            add_self=add_self)
+        
+        for i in range(1,n_layers):
+            setattr(self,f"conv{i}",BatchedGraphSAGE(
+            n_hidden_channels,
+            n_hidden_channels,
+            device = device,
+            use_bn=use_bn, 
+            mean=mean, 
+            add_self=add_self))
+            
+        self.n_conv = n_layers
+        
+        #self.act_func = getattr(F,activation_function)
+        self.global_pool_type = global_pool_type
+        
+        self.classifier = Classifier(
+            n_classes = dataset_num_classes,
+            n_inputs = n_hidden_channels,
+            n_hidden = classifier_n_hidden,
+        )
+        
+    def encode(self,data):
+        x,adj,mask = data.x, data.adj, data.mask
+        
+        for i in range(self.n_conv):
+            if mask.shape[1] == x.shape[1]:
+                x = getattr(self,f"conv{i}")(x, adj, mask)
+            else:
+                x = getattr(self,f"conv{i}")(x, adj)
+            
+        x = x * mask.reshape(*mask.shape,1)
+        #readout_x = self.global_pool_func(x, batch)  # [batch_size, hidden_channels]
+        readout_x = getattr(x,self.global_pool_type)(dim=1)
+        return readout_x
+    
+    def forward(self, data):
+        graph_feat = self.encode(data)
+        output = self.classifier(graph_feat)
+        return F.softmax(output, dim=-1)
+    
+        
+    
 
-    def forward(self, x):
-        return self.classifier(x)
+    
+# --------------------- ALL OF THE DIFFPOOL MODELS -------------
+
     
 # ---- simple diff pool -------------
 """
@@ -200,10 +527,11 @@ class DiffPoolSimple(torch.nn.Module):
         
         #classifier arguments
         classifier_n_hidden = 50,
+        global_pool_type="mean"
         
         ):
         super(DiffPoolSimple, self).__init__()
-
+        self.global_pool_type = global_pool_type
 #         if max_nodes > dataset_num_node_features:
 #             max_nodes = dataset_num_node_features
         
@@ -266,7 +594,7 @@ class DiffPoolSimple(torch.nn.Module):
 
         x = getattr(self,f"gnn{self.n_pool_layers}_embed")(x, adj)
 
-        x = x.mean(dim=1)
+        x = getattr(x,self.global_pool_type)(dim=1)
         if return_loss:
             return x,np.sum(gnn_loss),np.sum(cluster_loss)
         else:
@@ -283,49 +611,6 @@ Official source: https://github.com/RexYing/diffpool
 
 pyg implementation paper source = https://github.com/VoVAllen/diffpool
 """
-
-class BatchedGraphSAGE(nn.Module):
-    def __init__(
-        self, 
-        infeat, 
-        outfeat,
-        device='cpu',
-        use_bn=True, 
-        mean=False, 
-        add_self=False):
-        
-        super().__init__()
-        self.add_self = add_self
-        self.use_bn = use_bn
-        self.device = device
-        self.mean = mean
-        self.W = nn.Linear(infeat, outfeat, bias=True)
-        nn.init.xavier_uniform_(self.W.weight, gain=nn.init.calculate_gain('relu'))
-
-    def forward(
-        self,
-        #data
-        x,
-        adj,
-        mask = None,
-        ):
-        #x,adj,mask = data.x, data.adj, data.mask
-        if self.add_self:
-            adj = adj + torch.eye(adj.size(0)).to(self.device)
-
-        if self.mean:
-            adj = adj / adj.sum(1, keepdim=True)
-
-        h_k_N = torch.matmul(adj, x)
-        h_k = self.W(h_k_N)
-        h_k = F.normalize(h_k, dim=2, p=2)
-        h_k = F.relu(h_k)
-        if self.use_bn:
-            self.bn = nn.BatchNorm1d(h_k.size(1)).to(self.device)
-            h_k = self.bn(h_k)
-        if mask is not None:
-            h_k = h_k * mask.unsqueeze(2).expand_as(h_k)
-        return h_k
 
 
 class BatchedDiffPool(nn.Module):
@@ -400,6 +685,7 @@ class DiffPoolSAGE(nn.Module):
         n_pool_layers = 2,
         device="cpu",
         link_pred=False,
+        global_pool_type="mean",
         
         #classifier parameters
         classifier_n_hidden = 50):
@@ -449,10 +735,13 @@ class DiffPoolSAGE(nn.Module):
             n_inputs = n_hidden_channels,
             n_hidden = classifier_n_hidden,
         )
+    
+        self.global_pool_type = global_pool_type
         # writer.add_text(str(vars(self)))
 
     def encode(self,data):
         x,adj,mask = data.x, data.adj, data.mask
+        
         for layer in self.layers:
             if isinstance(layer, BatchedGraphSAGE):
                 if mask.shape[1] == x.shape[1]:
@@ -466,8 +755,9 @@ class DiffPoolSAGE(nn.Module):
                 else:
                     x, adj = layer(x, adj)
 
-        # x = x * mask
-        readout_x = x.sum(dim=1)
+        x = x * mask
+        #readout_x = self.global_pool_func(x, batch)  # [batch_size, hidden_channels]
+        readout_x = getattr(x,global_pool_type)(dim=1)
         return readout_x
     def forward(self, data):
         graph_feat = self.encode(data)
@@ -495,8 +785,7 @@ Improved Semantic Representations From Tree-Structured Long Short-Term Memory Ne
 https://arxiv.org/abs/1503.00075
 """
     
-import torch as th
-import torch.nn as nn
+
 from collections import namedtuple
 import dgl
 
@@ -622,10 +911,11 @@ class TreeLSTM(nn.Module):
 #         print(f"list(dgl.topological_nodes_generator(g)) = {list(dgl.topological_nodes_generator(g))}")
         # feed embedding
         #embeds = self.embedding(batch.wordid * batch.mask)
+        embeddings = embeddings# * batch.mask
         g.ndata['iou'] = self.cell.W_iou(
             self.dropout(embeddings),
             #embeddings
-        )# * batch.mask.float().unsqueeze(-1)
+        )#* batch.mask.float().unsqueeze(-1)
         g.ndata['h'] = h
         g.ndata['c'] = c
         # propagate
@@ -680,3 +970,48 @@ model = models.Model(
     )
 
 """
+
+'''
+GraphSAGE did not import: 
+
+from torch_geometric.nn import SAGEConv
+"""
+Source: https://colab.research.google.com/github/sachinsharma9780/interactive_tutorials/blob/master/notebooks/example_output/Comprehensive_GraphSage_Guide_with_PyTorchGeometric_Output.ipynb#scrollTo=ROXBserO_amj
+
+
+How GraphSAGE is different: 
+
+The GraphSage is different from GCNs is two ways: i.e.
+1) Instead of taking the entire K-hop neighborhood of a 
+    target node, GraphSage first samples or prune the K-hop
+    neighborhood computation graph and then perform the 
+    feature aggregation operation on this sampled graph 
+    in order to generate the embeddings for a target node. 
+2) During the learning process, in order to generate the node
+    embeddings; GraphSage learns the aggregator function 
+    whereas GCNs make use of the symmetrically normalized 
+    graph Laplacian.
+
+"""
+class SAGE(torch.nn.Module):
+    def __init__(
+        self, 
+        dataset_num_node_features,
+        n_hidden_channels, 
+        dataset_num_classes,
+        n_layers=3):
+        super(SAGE, self).__init__()
+
+        self.num_layers = n_layers
+
+        self.convs = torch.nn.ModuleList()
+        self.convs.append(SAGEConv(dataset_num_node_features, n_hidden_channels))
+        for _ in range(n_layers - 2):
+            self.convs.append(SAGEConv(n_hidden_channels, n_hidden_channels))
+        self.convs.append(SAGEConv(n_hidden_channels, dataset_num_classes))
+
+    def reset_parameters(self):
+        for conv in self.convs:
+            conv.reset_parameters()
+
+'''

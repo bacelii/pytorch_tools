@@ -1,3 +1,0 @@
-# how to run tensorboard inside a docker container
-%load_ext tensorboard
-%tensorboard --logdir /neuron_mesh_tools/Auto_Proofreading/Minnie65_Analysis/GNN_Classification/GNN_Models/runs --bind_all
