@@ -59,6 +59,8 @@ class ClassifierFlat(nn.Module):
         dropout = 0.5,
         **kwargs
         ):
+        
+        super(ClassifierFlat, self).__init__()
         self.lin = Linear(n_inputs, n_classes)
         self.dropout = dropout
         
@@ -240,7 +242,7 @@ class GAT(nn.Module):
                 convN_heads = heads
             setattr(self,f"conv{i}",GATConv(n_hidden_channels*prev_heads, n_hidden_channels,
                            heads=convN_heads, dropout=dropout))
-            prev_heads = heads
+            prev_heads = convN_heads
             
         self.dropout = dropout
         if global_pool_type is not None:
@@ -255,9 +257,11 @@ class GAT(nn.Module):
         else:
             classifier_class = Classifier
             
+        self.last_n_heads = prev_heads
+            
         self.classifier = classifier_class(
             n_classes = dataset_num_classes,
-            n_inputs = n_hidden_channels*heads,
+            n_inputs = n_hidden_channels*prev_heads,
         )
 
     def reset_parameters(self):
