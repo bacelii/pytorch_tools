@@ -21,6 +21,8 @@ def save_checkpoint(
     if loss is not None:
         save_dict["loss"] = loss
         
+    torch.save(save_dict,filepath)
+        
 def load_checkpoint_to_model(filepath,model):
     checkpoint = torch.load(filepath)
     model.load_state_dict(checkpoint[model_save_name])
