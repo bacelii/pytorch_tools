@@ -23,6 +23,7 @@ class Classifier(nn.Module):
         n_hidden_layers = 1,
         f = True,
         use_bn = False,
+        softmax = False,
         ):
         
         if n_hidden is None:
@@ -47,9 +48,13 @@ class Classifier(nn.Module):
         self.classifier = nn.Sequential(*hid_layers
                                         )
         self.use_bn = use_bn
+        self.softmax = softmax
 
     def forward(self, x):
-        return self.classifier(x)
+        x =  self.classifier(x)
+        if self.softmax:
+            x = F.softmax(x,dim=1)
+        return x
     
 class ClassifierFlat(nn.Module):
     def __init__(
@@ -57,16 +62,20 @@ class ClassifierFlat(nn.Module):
         n_classes,
         n_inputs,
         dropout = 0.5,
+        softmax = False,
         **kwargs
         ):
         
         super(ClassifierFlat, self).__init__()
         self.lin = Linear(n_inputs, n_classes)
         self.dropout = dropout
+        self.softmax = softmax
         
     def forward(self,x):
         x = F.dropout(x, p=self.dropout, training=self.training)
         x = self.lin(x)
+        if self.softmax:
+            x = F.softmax(x,dim=1)
         return x
         
     
