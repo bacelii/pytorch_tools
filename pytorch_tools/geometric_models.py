@@ -130,6 +130,93 @@ class GCNFlat(torch.nn.Module):
         x = F.dropout(x, p=0.5, training=self.training)
         x = self.lin(x)
         return F.softmax(x,dim=1)
+    
+# ------------ FOR GRAPH SAGE IMPLEMENTATION --------------
+# Define our GCN class as a pytorch Module
+from torch_geometric.nn import SAGEConv
+from torch.nn import Linear
+class SAGEConvNet(torch.nn.Module):
+    def __init__(
+        self, 
+        n_hidden_channels,
+        dataset_num_node_features,
+        dataset_num_classes,
+        n_layers = 3,
+        activation_function = None,
+        global_pool_type="mean",
+        
+        #for the classifier
+        n_hidden_layers_classifier = 4,
+        n_starting_units_classifier = 200,
+        hidden_units_divisor = 2,
+        activation_function_classifier = "tanh"
+                ):
+        
+        super(SAGEConvNet, self).__init__()
+        # We inherit from pytorch geometric's GCN class, and we initialize three layers
+        self.conv0 = GCNConv(dataset_num_node_features, n_hidden_channels)
+        for i in range(1,n_layers):
+            setattr(self,f"conv{i}",SAGEConv(n_hidden_channels, n_hidden_channels))
+        self.n_conv = n_layers
+        
+        # Our final linear layer will define our output
+        self.lin0 = Linear(n_hidden_channels,n_starting_units_classifier)
+        previous_layers_units = n_starting_units_classifier
+        
+        self.n_hidden_layers_classifier = n_hidden_layers_classifier
+        
+        for i in range(1,n_hidden_layers_classifier):
+            
+            setattr(self,f"bn{i-1}",torch.nn.BatchNorm1d(previous_layers_units))
+            
+            if i == n_hidden_layers_classifier -1 :
+                new_layer_n_units = dataset_num_classes
+            else:
+                new_layer_n_units = previous_layers_units // hidden_units_divisor
+            setattr(self,f"lin{i}",Linear(previous_layers_units, new_layer_n_units))
+            previous_layers_units = new_layer_n_units
+            
+        if type(activation_function) == str:
+            self.act_func = getattr(F,activation_function)
+        else:
+            self.act_func = activation_function
+            
+        if type(activation_function_classifier) == str:
+            self.act_func_clf = getattr(F,activation_function_classifier)
+        else:
+            self.act_func_clf = activation_function_classifier
+            
+        self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+                
+        
+    def encode(self,data):
+        x, edge_index = data.x, data.edge_index
+        batch = getattr(data,"batch",None)
+        
+        if batch is None:
+            batch = torch.zeros(x.shape[0],dtype=torch.int64)
+        # 1. Obtain node embeddings 
+        for i in range(self.n_conv):
+            x = getattr(self,f"conv{i}")(x, edge_index)
+            if i < self.n_conv-1:
+                if self.act_func is not None:
+                    x = self.act_func(x)
+                    
+        # 2. Readout layer
+        
+        x = self.global_pool_func(x, batch)  # [batch_size, hidden_channels]
+        return x
+    
+    def forward(self, data):
+        x = self.encode(data)
+        # 3. Apply a final classifier
+        for i in range(self.n_hidden_layers_classifier):
+            x = F.dropout(x, p=0.5, training=self.training)
+            x = getattr(self,f"lin{i}")(x)
+            if i < self.n_hidden_layers_classifier - 1:
+                x = getattr(self,f"bn{i}")(x)
+                x = self.act_func_clf(x)
+        return F.softmax(x,dim=1)
 
 
 
