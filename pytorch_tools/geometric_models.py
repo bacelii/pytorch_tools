@@ -121,6 +121,7 @@ class ClassifierFlat(nn.Module):
         n_inputs,
         dropout = 0.5,
         softmax = False,
+        use_bn = True,
         **kwargs
         ):
         
@@ -150,13 +151,22 @@ class GCNFlat(torch.nn.Module):
         n_layers = 3,
         activation_function = "relu",
         global_pool_type="mean",
+        use_bn = False,
+        track_running_stats=True,
                 ):
         
         super(GCNFlat, self).__init__()
         # We inherit from pytorch geometric's GCN class, and we initialize three layers
         self.conv0 = GCNConv(dataset_num_node_features, n_hidden_channels)
+        self.use_bn = use_bn
+        
+        if use_bn:
+            self.bn0 = torch.nn.BatchNorm1d(n_hidden_channels,track_running_stats=track_running_stats)
+        
         for i in range(1,n_layers):
             setattr(self,f"conv{i}",GCNConv(n_hidden_channels, n_hidden_channels))
+            if use_bn: 
+                setattr(self,f"bn{i}",torch.nn.BatchNorm1d(n_hidden_channels,track_running_stats=track_running_stats))
         self.n_conv = n_layers
         
         # Our final linear layer will define our output
@@ -174,6 +184,8 @@ class GCNFlat(torch.nn.Module):
         # 1. Obtain node embeddings 
         for i in range(self.n_conv):
             x = getattr(self,f"conv{i}")(x, edge_index)
+            if self.use_bn:
+                x = getattr(self,f"bn{i}")(x)
             if i < self.n_conv-1:
                 x = self.act_func(x)
                     
@@ -414,7 +426,7 @@ class GAT(nn.Module):
 
     
         #--- parameters for size of classifier
-        classifier_flat = False,
+        classifier_type = "Flat",
         classifier_n_hidden = None,):
         super(GAT, self).__init__()
         
@@ -445,7 +457,7 @@ class GAT(nn.Module):
             
         self.n_conv = n_layers
         
-        if classifier_flat:
+        if classifier_type == "Flat":
             classifier_class = ClassifierFlat
         else:
             classifier_class = Classifier

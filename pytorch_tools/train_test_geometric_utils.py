@@ -8,6 +8,8 @@ import torch
 import evaluation_utils as evu
 import numpy as np
 
+import pandas as pd
+
 def forward_pass(
     model,
     data_loader,
@@ -44,30 +46,34 @@ def forward_pass(
     for data in data_loader:#train_loader:  # Iterate in batches over the training dataset.
         
         data = data.to(device)
-        if model_name == "DiffPool":
-            out,gnn_loss, cluster_loss = model(data)  # Perform a single forward pass.
-            #y_true = data.y.reshape(-1,3)
-        elif model_name == "TreeLSTM":
-            n = data.x.shape[0]
-            h = torch.zeros((n, architecture_kwargs["n_hidden_channels"]))
-            c = torch.zeros((n, architecture_kwargs["n_hidden_channels"]))
-            out = model(
-                data,
-                h = h,
-                c = c,
-                embeddings = data.x
-                )
+        if model_name is not None:
+            if "DiffPool" in model_name:
+                out,gnn_loss, cluster_loss = model(data)  # Perform a single forward pass.
+                #y_true = data.y.reshape(-1,3)
+            elif model_name == "TreeLSTM":
+                n = data.x.shape[0]
+                h = torch.zeros((n, architecture_kwargs["n_hidden_channels"]))
+                c = torch.zeros((n, architecture_kwargs["n_hidden_channels"]))
+                out = model(
+                    data,
+                    h = h,
+                    c = c,
+                    embeddings = data.x
+                    )
+            else:
+                out = model(data)
         else:
             out = model(data)
         y_true = data.y.squeeze_()
         #print(f"out.shape = {out.shape}, data.y.shape = {data.y.shape}")
-        loss = loss_function(
-            torch.log(out), 
-            y_true,
-            weight = class_weights,
-        )  # Compute the loss.
+        
         
         if mode == "train":
+            loss = loss_function(
+                torch.log(out), 
+                y_true,
+                weight = class_weights,
+                )  # Compute the loss.
             loss.backward()  # Derive gradients.
             optimizer.step()  # Update parameters based on gradients.
             optimizer.zero_grad()  # Clear gradients.
@@ -154,6 +160,7 @@ def forward_pass_embed_df(
         model,
         data_loader=data_loader,
         mode = "embed",
+        return_dict_for_embed = True,
         return_predicted_labels = return_predicted_labels,
         return_data_names=return_data_names,
         return_data_sources = return_data_sources,
