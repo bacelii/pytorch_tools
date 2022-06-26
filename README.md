@@ -27,6 +27,7 @@ git clone https://github.com/celiibrendan/pytorch_tools.git
 
 """
 Would then add to your path as follows: 
+
 from os import sys
 #sys.path.append("/meshAfterParty/meshAfterParty")
 sys.path.append("/python_tools/python_tools")
