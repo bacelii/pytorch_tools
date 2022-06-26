@@ -28,10 +28,8 @@ git clone https://github.com/celiibrendan/pytorch_tools.git
 """
 Would then add to your path as follows: 
 from os import sys  
-#sys.path.append("/meshAfterParty/meshAfterParty")  
 sys.path.append("/python_tools/python_tools")  
 sys.path.append("/machine_learning_tools/machine_learning_tools/")  
 sys.path.append("/pytorch_tools/pytorch_tools/")  
-sys.path.append("/neuron_morphology_tools/neuron_morphology_tools/")  
-sys.path.append("/meshAfterParty/meshAfterParty/")  
+sys.path.append("/neuron_morphology_tools/neuron_morphology_tools/")
 """
