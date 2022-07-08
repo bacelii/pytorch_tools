@@ -105,7 +105,7 @@ def load_data(
     
     # for appending 
     data_source = None,
-    
+    columns_to_append_to_data =None,
     
     verbose = True,
     
@@ -189,7 +189,8 @@ def load_data(
         features_to_keep = None,
         data_name = None,
         data_source = None,
-        default_y = -1
+        default_y = -1,
+        **kwargs
         ): 
         """
         Purpose: To convert our data format into pytorch Data object
@@ -260,6 +261,9 @@ def load_data(
         if data_source is not None:
             data_dict["data_source"] = data_source
             
+        for k,v in kwargs.items():
+            data_dict[k] = v
+            
         
         data = Data(**data_dict)
         
@@ -270,8 +274,10 @@ def load_data(
                      transform=None,
                      pre_transform=None, 
                      pre_filter=None,
-                    only_process_labeled = False,):
+                    only_process_labeled = False,
+                    columns_to_append_to_data=columns_to_append_to_data):
             self.only_process_labeled = only_process_labeled
+            self.columns_to_append_to_data = columns_to_append_to_data
             super().__init__(root, transform, pre_transform, pre_filter)
             self.data, self.slices = torch.load(self.processed_paths[0])
             
@@ -294,11 +300,30 @@ def load_data(
             # Read data into huge `Data` list.
 
             data_list = []
+            
+            """
             for k,y,segment_id,split_index in tqdm(zip(
                 data_df[data_column].to_list(),
                 data_df[graph_label].to_list(),
-                data_df["segment_id"],
-                data_df["split_index"])):
+                data_df["segment_id"].to_list(),
+                data_df["split_index"].to_list())):
+            """
+            columns_to_append_to_data = self.columns_to_append_to_data
+            if columns_to_append_to_data is None:
+                if 'str' in str(type(columns_to_append_to_data)):
+                    columns_to_append_to_data = [columns_to_append_to_data]
+            else:
+                columns_to_append_to_data = []
+                
+            for curr_data in tqdm(pu.df_to_dicts(data_df)):
+                k = curr_data[data_column]
+                y = curr_data[graph_label]
+                segment_id = curr_data["segment_id"]
+                split_index = curr_data["split_index"]
+                
+                extra_columns = dict()
+                for k in columns_to_append_to_data:
+                    extra_columns[k] = curr_data[k]
                 
                 if y is None and self.only_process_labeled:
                     #print(f"Skipping becuase unlabeled")
@@ -312,7 +337,8 @@ def load_data(
                         features_to_keep = features_to_keep,
                         data_name = f"{segment_id}_{split_index}",
                         data_source = data_source,
-                        verbose = False))
+                        verbose = False,
+                        **extra_columns))
 
             if self.pre_filter is not None:
                 data_list_final = []
@@ -390,6 +416,7 @@ def load_data(
             pre_transform = transform_norm,
             pre_filter = pre_filter,
             only_process_labeled = only_process_labeled,
+            columns_to_append_to_data=columns_to_append_to_data
             )
     
     if return_label_int_map:

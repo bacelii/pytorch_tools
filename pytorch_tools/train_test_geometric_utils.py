@@ -10,6 +10,8 @@ import numpy as np
 
 import pandas as pd
 
+eps=1e-7
+
 def forward_pass(
     model,
     data_loader,
@@ -67,10 +69,10 @@ def forward_pass(
         y_true = data.y.squeeze_()
         #print(f"out.shape = {out.shape}, data.y.shape = {data.y.shape}")
         
-        
+        #print(f"out.min() = {out.min()}, out.max() = {out.max()}")
         if mode == "train":
             loss = loss_function(
-                torch.log(out), 
+                torch.log(out + eps), 
                 y_true,
                 weight = class_weights,
                 )  # Compute the loss.
