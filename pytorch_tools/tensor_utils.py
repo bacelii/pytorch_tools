@@ -12,3 +12,16 @@ def cat(tensors,dim = None,**kwargs):
 
 def numpy_array(tensor):
     return tensor.cpu().detach().numpy()
+
+def vstack(tensors,**kwargs):
+    """
+    Purpose: To vertically stack tensors on top
+    of each other
+    
+    Ex: 
+    x = torch.Tensor([[1,2,3,4,5],[7,8,9,10,11]])
+    new_values = torch.Tensor([10,20,30,40,50])
+    torch.vstack([x,new_values])
+    """
+    return torch.vstack(tensors,**kwargs)
+    
