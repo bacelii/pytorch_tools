@@ -25,7 +25,8 @@ def forward_pass(
     return_predicted_labels = False,
     return_data_names = False,
     return_data_sources = False,
-    return_dict_for_embed = False,):
+    return_dict_for_embed = False,
+    features_to_return = None):
     
     if type(loss_function) == str:
         loss_function = getattr(F,loss_function)
@@ -44,7 +45,13 @@ def forward_pass(
     labels = []
     data_names = []
     data_sources = []
+    
+    if features_to_return is not None:
+        if "str" in str(type(features_to_return)):
+            features_to_return = [features_to_return]
 
+        features_dict = {k:[] for k in features_to_return}
+        
     for data in data_loader:#train_loader:  # Iterate in batches over the training dataset.
         
         data = data.to(device)
@@ -93,6 +100,10 @@ def forward_pass(
                 data_names.append(data.data_name)
             if return_data_sources:
                 data_sources.append(data.data_source)
+                
+            if features_to_return is not None:
+                for f in features_to_return:
+                    features_dict[f].append(getattr(data,f))
         else:
             raise Exception("Unknown mode")
             
@@ -129,6 +140,11 @@ def forward_pass(
             data_sources = np.hstack(data_sources)
             return_value.append(data_sources)
             return_value_names.append("data_sources")
+            
+        if features_to_return is not None:
+            for f in features_to_return:
+                return_value.append(np.hstack(features_dict[f]))
+                return_value_names.append(f)
             
         if return_dict_for_embed:
             return {k:v for k,v in zip(return_value_names,return_value)}

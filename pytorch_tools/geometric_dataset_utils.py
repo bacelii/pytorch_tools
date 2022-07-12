@@ -275,7 +275,8 @@ def load_data(
                      pre_transform=None, 
                      pre_filter=None,
                     only_process_labeled = False,
-                    columns_to_append_to_data=columns_to_append_to_data):
+                    columns_to_append_to_data=None):
+            
             self.only_process_labeled = only_process_labeled
             self.columns_to_append_to_data = columns_to_append_to_data
             super().__init__(root, transform, pre_transform, pre_filter)
@@ -309,11 +310,12 @@ def load_data(
                 data_df["split_index"].to_list())):
             """
             columns_to_append_to_data = self.columns_to_append_to_data
-            if columns_to_append_to_data is None:
+            if columns_to_append_to_data is not None:
                 if 'str' in str(type(columns_to_append_to_data)):
                     columns_to_append_to_data = [columns_to_append_to_data]
             else:
                 columns_to_append_to_data = []
+                
                 
             for curr_data in tqdm(pu.df_to_dicts(data_df)):
                 k = curr_data[data_column]
@@ -322,8 +324,12 @@ def load_data(
                 split_index = curr_data["split_index"]
                 
                 extra_columns = dict()
-                for k in columns_to_append_to_data:
-                    extra_columns[k] = curr_data[k]
+                for jj in columns_to_append_to_data:
+                    if (("list" in str(type(curr_data[jj]))) or 
+                        ("array" in str(type(curr_data[jj])))):
+                        extra_columns[jj] = torch.Tensor(curr_data[jj])
+                    else:
+                        extra_columns[jj] = curr_data[jj]
                 
                 if y is None and self.only_process_labeled:
                     #print(f"Skipping becuase unlabeled")
@@ -409,7 +415,7 @@ def load_data(
 
     transform_norm = transforms.Compose(transform_list)
     
-    
+    print(f"columns_to_append_to_data = {columns_to_append_to_data}")
     # b) Creating the Dataset
     dataset = CellTypeDataset(
             processed_data_folder.absolute(),
