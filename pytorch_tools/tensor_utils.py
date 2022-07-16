@@ -1,3 +1,5 @@
+import torch
+
 def map_tensor_with_tensor(tensor,tensor_map):
     """
     Purpose: Map numbers of one tensor
@@ -24,4 +26,9 @@ def vstack(tensors,**kwargs):
     torch.vstack([x,new_values])
     """
     return torch.vstack(tensors,**kwargs)
+
+def isnan(tensor):
+    return torch.isnan(tensor)
+def isnan_any(tensor):
+    return torch.any(torch.isnan(tensor))
     

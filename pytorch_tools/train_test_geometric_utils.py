@@ -7,10 +7,16 @@ import torch.nn.functional as F
 import torch
 import evaluation_utils as evu
 import numpy as np
+import parameters_utils as paru
 
 import pandas as pd
 
+
 eps=1e-7
+debug_nan = True
+
+import tensor_utils as tsu
+
 
 def forward_pass(
     model,
@@ -46,14 +52,16 @@ def forward_pass(
     data_names = []
     data_sources = []
     
+    
     if features_to_return is not None:
         if "str" in str(type(features_to_return)):
             features_to_return = [features_to_return]
 
         features_dict = {k:[] for k in features_to_return}
         
-    for data in data_loader:#train_loader:  # Iterate in batches over the training dataset.
-        
+    for jj,data in enumerate(data_loader):#train_loader:  # Iterate in batches over the training dataset.
+        if debug_nan:
+            print(f"\n\n------ iteration {jj}/{len(data_loader)}")
         data = data.to(device)
         if model_name is not None:
             if "DiffPool" in model_name:
@@ -77,6 +85,11 @@ def forward_pass(
         #print(f"out.shape = {out.shape}, data.y.shape = {data.y.shape}")
         
         #print(f"out.min() = {out.min()}, out.max() = {out.max()}")
+        if debug_nan:
+            print(f"out= {out}")
+            if tsu.isnan_any(out):
+                raise Exception("Nan output")
+                
         if mode == "train":
             loss = loss_function(
                 torch.log(out + eps), 
@@ -86,6 +99,14 @@ def forward_pass(
             loss.backward()  # Derive gradients.
             optimizer.step()  # Update parameters based on gradients.
             optimizer.zero_grad()  # Clear gradients.
+            if debug_nan:
+                paru.print_parameters(model)
+                print(f"loss = {loss}")
+                if paru.isnan_in_parameters(model):
+                    raise Exception("Nan parameters")
+                
+                
+                
         elif mode == "test":
             y_pred = out.argmax(dim=1)  # Use the class with highest probability.
             y_pred_list.append(y_pred)
