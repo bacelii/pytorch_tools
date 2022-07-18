@@ -201,6 +201,11 @@ class GCNFlat(torch.nn.Module):
         x = self.lin(x)
         return F.softmax(x,dim=1)
     
+class GCNHierarchical(torch.nn.Module):
+    def __init__(
+        self, ):
+        pass
+    
 # ------------ FOR GRAPH SAGE IMPLEMENTATION --------------
 # Define our GCN class as a pytorch Module
 from torch_geometric.nn import SAGEConv

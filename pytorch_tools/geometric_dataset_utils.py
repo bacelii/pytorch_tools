@@ -33,6 +33,8 @@ from torch_geometric.data import DenseDataLoader
 #pytorch_tools modules
 import preprocessing_utils as pret
 
+x_prefix_global = "x_pool"
+feature_name_suffix_global = "features"
 
 def normalization_df(
     data_df,
@@ -51,25 +53,16 @@ def normalization_df(
     
     all_batch_df = pd.concat(all_batch_df_flat)
 
-#     if label_name is not None:
-#         all_batch_df = all_batch_df[[k for k in 
-#                 all_batch_df.columns if k not in nu.convert_to_array_like(label_name)]]
-#     else:
-#         all_batch_df = all_batch_df
-
     # will use these to normalize the data
-    col_means = all_batch_df.mean(axis=0).to_numpy()
-    col_stds = all_batch_df.std(axis=0).to_numpy()
-    df_standardization = pd.DataFrame(np.array([col_means,col_stds]),
-         index=["norm_mean","norm_std"],
-        columns=all_batch_df.columns)
+    max_nodes = np.max(all_batch_df.index.to_numpy()) + 1
+    if verbose:
+        print(f"max_nodes = {max_nodes}")
+    
+    df_standardization = pu.normalize_df_with_names(all_batch_df)
 
     if verbose:
         print(f"Finished calculating normalization: {time.time() - st}")
 
-    max_nodes = np.max(all_batch_df.index.to_numpy()) + 1
-    if verbose:
-        print(f"max_nodes = {max_nodes}")
     
     return df_standardization
 
@@ -429,6 +422,464 @@ def load_data(
         return dataset,label_int_map
     else:
         return dataset
+    
+# --------- for the hierarchical models ------------
+    
+def x_columns(
+    df,
+    x_prefix = None,
+    feature_name_suffix = None,
+    verbose = False,
+    **kwargs
+    ):
+    if x_prefix is None:
+        x_prefix= x_prefix_global
+        
+    if feature_name_suffix is None:
+        feature_name_suffix= feature_name_suffix_global
+    
+    return_cols =  [k for k in df.columns if k[:6] == x_prefix and k[-len(feature_name_suffix):] != feature_name_suffix]
+    
+    if verbose:
+        print(f"x_columns = {return_cols}")
+        
+    return return_cols
+
+def x_column_feature_name(
+    column,
+    feature_name_suffix = None,):
+    
+    if feature_name_suffix is None:
+        feature_name_suffix= feature_name_suffix_global
+        
+    return f"{column}_{feature_name_suffix}"
+    
+def normalization_df_hierarchical(
+    df,
+    x_prefix = None,
+    feature_name_suffix = None,
+    feature_names = None,
+    verbose = False,
+    **kwargs
+    ):
+    """
+    Purpose: To create the normalization dataframe
+    for all of the pooling layers
+
+    Pseudocode: 
+    1) 
+    """
+    if x_prefix is None:
+        x_prefix= x_prefix_global
+        
+    if feature_name_suffix is None:
+        feature_name_suffix= feature_name_suffix_global
+    
+    
+    columns_to_normalize = gdu.x_columns(
+        df,
+        x_prefix = "x_pool",
+        feature_name_suffix = "features",
+        verbose = True,**kwargs)
+    
+
+    if feature_names is None:
+        feature_names = dict()
+
+    all_batch_df_flat = []
+    for col in columns_to_normalize:
+        feature_n = feature_names.get(col,None)
+        if feature_n is None:
+            col_names_column = gdu.x_column_feature_name(col,feature_name_suffix=feature_name_suffix)
+            feature_n = df[col_names_column][0]
+
+        curr_df = pu.concat([pu.df_from_array(k,feature_n) 
+                            for k in df[col].to_list()]).reset_index(drop=True)
+
+        all_batch_df_flat.append(pu.normalize_df_with_names(curr_df))
+
+    all_batch_df_flat = pu.concat(all_batch_df_flat,axis=1)
+    return all_batch_df_flat
+    
+def int_label_map(
+    labels=None,
+    df=None,
+    column = None
+    ):
+    
+    if labels is None:
+        labels = df[column].to_numpy()
+    labels = [k for k in labels if k is not None]
+    total_labels,label_counts = np.unique(labels,return_counts = True)
+    mapping = {k:i for i,k in enumerate(total_labels)}
+    return mapping
+
+def pool_array_names(df):
+    if type(df) == dict:
+        cols = list(df.keys())
+    else:
+        cols = df.columns
+    return [k for k in cols if "pool" in k and 
+             ("features" not in k) and ("names" not in k)]
+
+from tqdm_utils import tqdm
+def normalize_and_filter_x_columns(
+    df,
+    normalization_df=None,
+    columns_to_keep = None,
+    columns_to_delete = None,):
+    """
+    Purpose: To normalize and filter the
+    x features
+
+    Pseudocode: 
+    1) Get the columns want to normalize
+    2) For each row in the df:
+        For each column to normalize:
+        a. Get the dataframe with x and turn into dataframe
+        b. Filter for columns you want
+        c. Normalize the columns using the normalization dataframe
+        d. Add the new data to a dataframe
+
+    """
+
+
+    if normalization_df is None:
+        normalization_df = gdu.normalization_df_hierarchical(
+            df=df,
+        )
+
+    new_df = []
+    x_cols = gdu.x_columns(df)
+    for k in tqdm(pu.df_to_dicts(df)):
+        for x_c in x_cols:
+            f_name = gdu.x_column_feature_name(x_c)
+            curr_df = pu.df_from_array(k[x_c],k[f_name])
+
+            #-- restrict the dataframe
+            curr_df= pu.filter_columns(
+                curr_df,
+                columns_to_keep = None,
+                columns_to_delete = None
+            )
+
+            curr_df = pu.normalize_df_with_df(
+                df = curr_df,
+                df_norm = normalization_df,
+                verbose = False,
+            )
+            k[x_c] = curr_df.to_numpy()
+        new_df.append(k)
+
+    new_df = pd.DataFrame.from_records(new_df)
+    return new_df
+
+default_attr_map = dict(
+    edge_index_pool0 = "edge_index",
+    x_pool0 = "x"
+)
+def pytorch_data_hierarchical_from_single_data(
+    data_dict,
+    y = None,
+    y_column = None,
+    y_int_map=None,
+    default_y = -1,
+    
+    pool_array_names = None,
+    attributes_to_include = None,
+    data_source = None,
+    
+    verbose = False,
+    
+    **kwargs
+    ): 
+    """
+    Purpose: To convert a dictionary with
+    the data for one observation into a pytorch
+    geometric data object
+
+    Pseudocode: 
+    1) Get all of the pool attributes
+    """
+    
+    
+    if attributes_to_include is None:
+        attributes_to_include = dict()
+        
+    # -------- getting the label set up correctly
+    if y is None:
+        y = data_dict.get(y_column,None)
+        
+    if type(y) != int:
+        if not type(y) == str:
+            y = None
+
+        if y is None:
+            y_int = np.array(default_y).reshape(1,-1)
+        else:
+            y_int = np.array(y_int_map[y] ).reshape(1,-1)
+    else:
+        y_int = np.array(y_int).reshape(1,-1)
+        
+    y = torch.tensor(y_int,dtype=torch.long)
+    if len(y) > 1:
+        raise Exception(f"y = {y}")
+
+    if y.shape[0] != 1 or y.shape[1] != 1:
+        raise Exception(f"y = {y}")
+    
+    data_prep = dict(y=y)
+    
+    # getting the other data attributes
+    if pool_array_names is None:
+        pool_array_names = gdu.pool_array_names(data_dict)
+        
+    for k in pool_array_names:
+        curr_val = torch.tensor(data_dict[k],dtype=torch.float)
+        if "edge_index" in k:
+            curr_val = curr_val.T
+            
+        new_name = default_attr_map.get(k,k)
+        data_prep[new_name] = curr_val
+        
+    
+    for k in attributes_to_include:
+        val = data_dict[k]
+        if nu.is_array_like(val):
+            data_prep[k] = torch.Tensor(val)
+        else:
+            data_prep[k] = val
+            
+    for k,v in kwargs.items():
+        data_prep[k] = v
+    
+    
+    data = Data(**data_prep)
+    return data
+
+def load_data_hierarchical(
+    df,
+    graph_label,
+    
+    # -- location for storing the dataset --
+    processed_data_folder_name = None,
+    gnn_task_name = "gnn_task",
+    output_folder = "./",
+    
+    
+    #for the standardization
+    normalize = True,
+    normalization_df = None,
+    features_to_delete = None,
+    features_to_keep = None,
+    
+    
+    # for the mapping of the labels to integers
+    int_label_map = None,
+    
+    # For prepping dataset
+    dense_adj = False,
+    directed = False,
+    
+    #--------- processing the dataset ----
+    max_nodes = 300,
+    clean_prior_dataset = False,
+    only_process_labeled = False,
+    attributes_to_include =None,
+    data_source = None,
+
+    return_label_int_map = False,
+    verbose = True,
+    ):
+    
+    """
+    Purpose: Will load the data for processing using the GNN models
+    
+    """
+    
+    # 1) Creating the Output Folders
+    output_folder = Path(output_folder)
+    try:
+        output_folder.mkdir(exist_ok=True) 
+    except:
+        pass
+    
+    if processed_data_folder_name is None:
+        if dense_adj:
+            processed_data_folder = output_folder / Path(f"{gnn_task_name}")#_processed_dense")
+        elif directed:
+            processed_data_folder = output_folder / Path(f"{gnn_task_name}_directed")#_processed_dense")
+        else:
+            processed_data_folder = output_folder / Path(f"{gnn_task_name}_no_dense")#_processed_dense")
+    else:
+        processed_data_folder = output_folder / Path(f"{processed_data_folder_name}")
+
+    
+    #2) Normalizing the Dataset
+    if normalize or features_to_keep is not None or features_to_delete is not None:
+        df = gdu.normalize_and_filter_x_columns(
+            df = df,
+            normalization_df=normalization_df,
+            columns_to_keep = features_to_keep,
+            columns_to_delete = features_to_delete,
+        )
+    
+    
+    print(f"max_nodes = {max_nodes}")
+
+    
+    #3) Creating the Dataclass
+    if int_label_map is None:
+        int_label_map = gdu.int_label_map(df=df,column=graph_label)
+    else:
+        print(f"Using precomputed cell map")
+    
+    
+    # ---------- Creating the dataset --------------------
+    class CellTypeDataset(InMemoryDataset):
+        def __init__(self, root,
+                     transform=None,
+                     pre_transform=None, 
+                     pre_filter=None,
+                    #only_process_labeled = False,
+                    #attributes_to_include=None
+                    ):
+            
+            self.only_process_labeled = only_process_labeled
+            self.attributes_to_include = attributes_to_include
+            
+            super().__init__(root, transform, pre_transform, pre_filter)
+            self.data, self.slices = torch.load(self.processed_paths[0])
+            
+        def __inc__(self, key, value, *args, **kwargs):
+            if 'edge_index_' in key:
+                return self.num_nodes
+            else:
+                return 0    
+        
+        @property
+        def processed_file_names(self):
+            return ['data.pt']
+
+        def process(self,):
+            # Read data into huge `Data` list.
+
+            data_list = []
+            
+            """
+            for k,y,segment_id,split_index in tqdm(zip(
+                data_df[data_column].to_list(),
+                data_df[graph_label].to_list(),
+                data_df["segment_id"].to_list(),
+                data_df["split_index"].to_list())):
+            """
+            attributes_to_include = self.attributes_to_include
+            only_process_labeled = self.only_process_labeled
+            
+            if attributes_to_include is not None:
+                attributes_to_include = nu.convert_to_array_like(attributes_to_include)
+                
+            for curr_data in tqdm(pu.df_to_dicts(df)):
+                y = curr_data[graph_label]
+                
+                if y is None and only_process_labeled:
+                    continue
+                
+                local_datalist = gdu.pytorch_data_hierarchical_from_single_data(
+                    curr_data,
+                    y=curr_data[graph_label],
+                    attributes_to_include = attributes_to_include,
+                    y_int_map=int_label_map,
+                    data_source = data_source
+                )
+                
+                data_list.append(local_datalist)
+                
+
+            if self.pre_filter is not None:
+                data_list_final = []
+                for data in data_list:
+                    try:
+                        if self.pre_filter(data):
+                            data_list_final.append(data)
+                    except:
+                        continue
+
+                data_list = data_list_final
+
+            for j,d in enumerate(data_list):
+                if d.y.shape[0] != 1 or d.y.shape[1] != 1:
+                    raise Exception(f"{j}")
+
+            if self.pre_transform is not None:
+                data_list_final = []
+                for j,data in enumerate(data_list):
+                    try:
+                        curr_t = self.pre_transform(data)
+                        if curr_t.y.shape[0] != 1 or curr_t.y.shape[1] != 1:
+                            raise Exception(f"{j}, data = {curr_t}")
+                        data_list_final.append(curr_t)
+                    except:
+                        continue
+                data_list = data_list_final
+
+            for j,d in enumerate(data_list):
+                if d.y.shape[0] != 1 or d.y.shape[1] != 1:
+                    raise Exception(f"{j}, data = {d}")
+
+            data, slices = self.collate(data_list)
+            torch.save((data, slices), self.processed_paths[0])
+            
+    # --- creating the folder for the dataset --
+    if clean_prior_dataset:
+        try:
+            su.rm_dir(processed_data_folder)
+        except:
+            pass
+        
+    processed_data_folder.mkdir(exist_ok = True)
+    
+    
+    # a) Processing Filteres
+    class MyFilter(object):
+        def __call__(self, data):
+            return data.num_nodes <= max_nodes
+
+    if dense_adj:
+        #gets the maximum number of nodes in any of the graphs
+        transform_list = [
+            transforms.ToUndirected(),
+            T.ToDense(max_nodes),
+            #transforms.NormalizeFeatures(),
+            ]
+        pre_filter = MyFilter()
+    elif directed:
+        transform_list = []
+        pre_filter = None
+    else:
+        transform_list = [
+            transforms.ToUndirected(),]
+
+        pre_filter = None
+
+
+    transform_norm = transforms.Compose(transform_list)
+    
+    # b) Creating the Dataset
+    dataset = CellTypeDataset(
+            processed_data_folder.absolute(),
+            pre_transform = transform_norm,
+            pre_filter = pre_filter,
+            #attributes_to_include=attributes_to_include,
+            
+            )
+    
+    if return_label_int_map:
+        return dataset,label_int_map
+    else:
+        return dataset
+
+
 
 def closest_neighbors_in_embedding_df(
     df,

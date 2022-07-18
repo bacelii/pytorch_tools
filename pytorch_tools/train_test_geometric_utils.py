@@ -13,7 +13,7 @@ import pandas as pd
 
 
 eps=1e-7
-debug_nan = True
+
 
 import tensor_utils as tsu
 
@@ -32,7 +32,8 @@ def forward_pass(
     return_data_names = False,
     return_data_sources = False,
     return_dict_for_embed = False,
-    features_to_return = None):
+    features_to_return = None,
+    debug_nan = False):
     
     if type(loss_function) == str:
         loss_function = getattr(F,loss_function)
