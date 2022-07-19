@@ -424,6 +424,23 @@ def load_data(
         return dataset
     
 # --------- for the hierarchical models ------------
+
+class DataHierarchical(Data):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        
+    def __inc__(self, key, value, *args, **kwargs):
+        
+        if ('edge_index_' in key) or ("pool" in key and "_" not in key):
+            #print(f"Inside new incrementer for {key}")
+            pool_name = reu.match_pattern_in_str(
+                string = key,
+                pattern = "pool[0-9]+",
+                return_one = True,
+            )
+            return getattr(self,f"x_{pool_name}").size(0)
+        else:
+            return super().__inc__(key, value, *args, **kwargs)
     
 def x_columns(
     df,
@@ -635,7 +652,12 @@ def pytorch_data_hierarchical_from_single_data(
         pool_array_names = gdu.pool_array_names(data_dict)
         
     for k in pool_array_names:
-        curr_val = torch.tensor(data_dict[k],dtype=torch.float)
+        if "x" == k[0]:
+            dtype = torch.float
+        else:
+            dtype=torch.long
+            
+        curr_val = torch.tensor(data_dict[k],dtype=dtype)
         if "edge_index" in k:
             curr_val = curr_val.T
             
@@ -654,9 +676,10 @@ def pytorch_data_hierarchical_from_single_data(
         data_prep[k] = v
     
     
-    data = Data(**data_prep)
+    data = DataHierarchical(**data_prep)
     return data
 
+import regex_utils as reu
 def load_data_hierarchical(
     df,
     graph_label,
@@ -751,12 +774,6 @@ def load_data_hierarchical(
             super().__init__(root, transform, pre_transform, pre_filter)
             self.data, self.slices = torch.load(self.processed_paths[0])
             
-        def __inc__(self, key, value, *args, **kwargs):
-            if 'edge_index_' in key:
-                return self.num_nodes
-            else:
-                return 0    
-        
         @property
         def processed_file_names(self):
             return ['data.pt']

@@ -201,10 +201,165 @@ class GCNFlat(torch.nn.Module):
         x = self.lin(x)
         return F.softmax(x,dim=1)
     
+import numpy_utils as nu
 class GCNHierarchical(torch.nn.Module):
+    """
+    Purpose: To run a GCN model but with 
+    multiple steps of pooling
+    
+    Ex: Testing the basic model
+    curr_model = GCNHierarchical(
+        dataset_num_node_features=len(features_to_output_pool0),
+        dataset_num_classes=len(cell_type_map),
+        n_hidden_channels = 32,
+        n_hidden_channels_pool0 = [23,10,8],
+        n_hidden_channels_pool1 = [30,17,4],
+
+        num_node_features_pool1 = 1,
+        num_node_features_pool2 = 2,
+    )
+    
+    for jj,data in enumerate(test_loader):
+        out = curr_model(data)
+        
+    """
     def __init__(
-        self, ):
-        pass
+        self, 
+        dataset_num_node_features,
+        dataset_num_classes,
+        n_pool = 2,
+        
+        activation_function = "relu",
+        global_pool_type="mean",
+        use_bn = True,
+        track_running_stats=True,
+        
+        # -- parameters if not layer specific ---
+        n_hidden_channels=None,
+        n_layers = None,
+        
+        verbose = True,
+        #-- example of how to define the pooling variables --
+        #n_hidden_channels_pool0
+        #n_layers_pool0
+        #num_node_features_pool1
+        #num_node_features_pool2
+        **kwargs
+        ):
+        
+        super(GCNHierarchical, self).__init__()
+        self.n_pool = n_pool
+        self.use_bn = use_bn
+        self.act_func = getattr(F,activation_function)
+        self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+        
+        # We inherit from pytorch geometric's GCN class, and we initialize three layers
+        n_input_layer = dataset_num_node_features
+        
+        for pool_idx in range(n_pool):
+            suffix = f"_pool{pool_idx}"
+            n_hidden_channels_pool = kwargs.get(f"n_hidden_channels_pool{pool_idx}",
+                                               n_hidden_channels)
+            
+            if n_hidden_channels_pool is None:
+                raise Exception("")
+                
+            if not nu.is_array_like(n_hidden_channels_pool):
+                n_layers_pool = kwargs.get(f"n_layers_pool{pool_idx}",
+                                               n_layers)
+                n_hidden_channels_pool = [n_hidden_channels_pool]*(n_layers_pool)
+            else:
+                n_layers_pool = len(n_hidden_channels_pool)
+#                 if len(n_hidden_channels_pool) != n_layers_pool - 1:
+#                     raise Exception("Not enough hidden layers defined")
+                
+            n_hidden_channels_pool = np.hstack([n_input_layer,n_hidden_channels_pool])
+                
+            if verbose:
+                print(f"Pool {pool_idx} n_hidden_channels_pool = {n_hidden_channels_pool}")
+            for i in range(len(n_hidden_channels_pool)-1):
+                n_input = n_hidden_channels_pool[i]
+                n_output = n_hidden_channels_pool[i+1]
+                
+                setattr(self,f"conv{i}{suffix}",GCNConv(n_input, n_output))
+                
+                if use_bn: 
+                    setattr(self,
+                            f"bn{i}{suffix}",
+                            torch.nn.BatchNorm1d(
+                                n_output,
+                                track_running_stats=track_running_stats
+                    ))
+            setattr(self,f"n_conv{suffix}",n_layers_pool)
+            
+            n_input_layer = (
+                n_hidden_channels_pool[-1] + 
+                kwargs.get(f"num_node_features_pool{pool_idx+1}"))
+        
+        # now have to do the linear layers
+        self.lin = Linear(n_input_layer, dataset_num_classes)
+        
+                
+    def encode(self,data,pool_return = None):
+        """
+        Purpose: To encode the data to a certain pool range
+        """
+        debug_encode = False
+        if pool_return is None:
+            pool_return = self.n_pool
+        
+        x, edge_index = data.x, data.edge_index
+        batch = getattr(data,"batch",None)
+        
+        for pool_idx in range(self.n_pool):
+            if debug_encode:
+                print(f"Working on Pool {pool_idx}")
+            suffix = f"_pool{pool_idx}"
+            n_conv = getattr(self,f"n_conv{suffix}")
+            
+            # running the actual convolution
+            for i in range(n_conv):
+                if debug_encode:
+                    print(f"Working on Layer {i}")
+                x = getattr(self,f"conv{i}{suffix}")(x, edge_index)
+                if self.use_bn:
+                    x = getattr(self,f"bn{i}{suffix}")(x)
+                if (i < n_conv-1) and (pool_idx == self.n_pool - 1):
+                    x = self.act_func(x)
+            
+            if pool_return == 0:
+                return x
+            
+            # getting the pooling information
+            next_pool = f"pool{pool_idx+1}"
+            pool_vec = getattr(data,next_pool,batch)
+            
+#             if pool_vec is None:
+#                 if debug_encode:
+#                     print(f"Using the batch as the pooling")
+#                 pool_vec = batch
+            
+            # getting the new feature matrix
+            x_pre = self.global_pool_func(x,pool_vec)
+            x_pool = getattr(data,f"x_{next_pool}",torch.Tensor([]))
+            x = torch.hstack([x_pre,x_pool])
+            
+            if pool_return == pool_idx + 1:
+                return x
+            
+            #getting new edge index
+            edge_index = getattr(data,f"edge_index_{next_pool}")
+            batch = global_mean_pool(batch,pool_vec)
+            
+            
+    def forward(self, data):
+        x = self.encode(data)
+        # 3. Apply a final classifier
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = self.lin(x)
+        return F.softmax(x,dim=1)
+        
+                
     
 # ------------ FOR GRAPH SAGE IMPLEMENTATION --------------
 # Define our GCN class as a pytorch Module
