@@ -432,14 +432,18 @@ class DataHierarchical(Data):
         
     def __inc__(self, key, value, *args, **kwargs):
         
-        if ('edge_index_' in key) or ("pool" in key and "_" not in key):
+        if (('edge_index_' in key) 
+            or ("pool" in key and "_" not in key)) and ("edge_weight" not in key):
             #print(f"Inside new incrementer for {key}")
             pool_name = reu.match_pattern_in_str(
                 string = key,
                 pattern = "pool[0-9]+",
                 return_one = True,
             )
-            return getattr(self,f"x_{pool_name}").size(0)
+            try:
+                return getattr(self,f"x_{pool_name}").size(0)
+            except:
+                return super().__inc__(key, value, *args, **kwargs)
         else:
             return super().__inc__(key, value, *args, **kwargs)
     
@@ -653,7 +657,7 @@ def pytorch_data_hierarchical_from_single_data(
         pool_array_names = gdu.pool_array_names(data_dict)
         
     for k in pool_array_names:
-        if "x" == k[0]:
+        if "x" == k[0] or "edge_weight" in k:
             dtype = torch.float
         else:
             dtype=torch.long
