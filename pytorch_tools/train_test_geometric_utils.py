@@ -57,8 +57,16 @@ def forward_pass(
     if features_to_return is not None:
         if "str" in str(type(features_to_return)):
             features_to_return = [features_to_return]
+    else:
+        features_to_return = []
+        
+    if return_data_names:
+        features_to_return += ["data_name","name"]
+        
+    if return_data_sources:
+        features_to_return.append("data_source")
 
-        features_dict = {k:[] for k in features_to_return}
+    features_dict = {k:[] for k in features_to_return}
         
     for jj,data in enumerate(data_loader):#train_loader:  # Iterate in batches over the training dataset.
         if debug_nan:
@@ -118,14 +126,17 @@ def forward_pass(
             
             embeddings.append(out_array)
             labels.append(out_labels)
-            if return_data_names:
-                data_names.append(data.data_name)
-            if return_data_sources:
-                data_sources.append(data.data_source)
+#             if return_data_names:
+#                 data_names.append(data.data_name)
+#             if return_data_sources:
+#                 data_sources.append(data.data_source)
                 
             if features_to_return is not None:
                 for f in features_to_return:
-                    features_dict[f].append(getattr(data,f))
+                    try:
+                        features_dict[f].append(getattr(data,f))
+                    except:
+                        pass
         else:
             raise Exception("Unknown mode")
             
@@ -153,18 +164,20 @@ def forward_pass(
         if return_predicted_labels:
             return_value.append(np.argmax(embeddings,axis=1))
             return_value_names.append("predicted_labels")
-        if return_data_names:
-            data_names = np.hstack(data_names)
-            return_value.append(data_names)
-            return_value_names.append("data_names")
+#         if return_data_names:
+#             data_names = np.hstack(data_names)
+#             return_value.append(data_names)
+#             return_value_names.append("data_names")
         
-        if return_data_sources:
-            data_sources = np.hstack(data_sources)
-            return_value.append(data_sources)
-            return_value_names.append("data_sources")
+#         if return_data_sources:
+#             data_sources = np.hstack(data_sources)
+#             return_value.append(data_sources)
+#             return_value_names.append("data_sources")
             
         if features_to_return is not None:
             for f in features_to_return:
+                if len(features_dict[f]) == 0:
+                    continue
                 return_value.append(np.hstack(features_dict[f]))
                 return_value_names.append(f)
             

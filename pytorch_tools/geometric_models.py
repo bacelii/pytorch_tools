@@ -6,6 +6,7 @@ from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool
 import numpy as np
 import torch as th
 import torch.nn as nn
+import geometric_tensor_utils as gtu
 """
 Notes: 
 Usually only have to use the batch variable when doing global pooling
@@ -142,6 +143,7 @@ class ClassifierFlat(nn.Module):
 
 # ---------------- basic graph neural network models -----------
 # Define our GCN class as a pytorch Module
+import geometric_tensor_utils as gtu
 class GCNFlat(torch.nn.Module):
     def __init__(
         self, 
@@ -151,8 +153,11 @@ class GCNFlat(torch.nn.Module):
         n_layers = 3,
         activation_function = "relu",
         global_pool_type="mean",
+        global_pool_weight = "node_weight",
         use_bn = False,
         track_running_stats=True,
+        normalize = True,
+        improved = False,
                 ):
         
         super(GCNFlat, self).__init__()
@@ -160,11 +165,19 @@ class GCNFlat(torch.nn.Module):
         self.conv0 = GCNConv(dataset_num_node_features, n_hidden_channels)
         self.use_bn = use_bn
         
+        #for other gcn features
+        self.gcn_normalize = normalize
+        self.gcn_improved = improved
+        
         if use_bn:
             self.bn0 = torch.nn.BatchNorm1d(n_hidden_channels,track_running_stats=track_running_stats)
         
         for i in range(1,n_layers):
-            setattr(self,f"conv{i}",GCNConv(n_hidden_channels, n_hidden_channels))
+            setattr(self,f"conv{i}",GCNConv(
+                n_hidden_channels, 
+                n_hidden_channels,
+                normalize = self.gcn_normalize,
+                improved = self.gcn_improved))
             if use_bn: 
                 setattr(self,f"bn{i}",torch.nn.BatchNorm1d(n_hidden_channels,track_running_stats=track_running_stats))
         self.n_conv = n_layers
@@ -172,7 +185,12 @@ class GCNFlat(torch.nn.Module):
         # Our final linear layer will define our output
         self.lin = Linear(n_hidden_channels, dataset_num_classes)
         self.act_func = getattr(F,activation_function)
-        self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+        
+        self.global_pool_type = global_pool_type
+        self.global_pool_func = getattr(gtu,f"global_{global_pool_type}_pool")
+        self.global_pool_weight = global_pool_weight
+        
+        
                 
         
     def encode(self,data):
@@ -190,8 +208,11 @@ class GCNFlat(torch.nn.Module):
                 x = self.act_func(x)
                     
         # 2. Readout layer
-        
-        x = self.global_pool_func(x, batch)  # [batch_size, hidden_channels]
+        if "weight" in self.global_pool_type:
+            weight_values = getattr(data,self.global_pool_weight)
+            x = self.global_pool_func(x, batch,weight_values)
+        else:
+            x = self.global_pool_func(x, batch)  # [batch_size, hidden_channels]
         return x
     
     def forward(self, data):
@@ -231,12 +252,16 @@ class GCNHierarchical(torch.nn.Module):
         
         activation_function = "relu",
         global_pool_type="mean",
+        global_pool_weight = "node_weight",
+        
         use_bn = True,
         track_running_stats=True,
         
         # -- parameters if not layer specific ---
         n_hidden_channels=None,
         n_layers = None,
+        edge_weight = False,
+        edge_weight_name = "edge_weight",
         
         verbose = True,
         #-- example of how to define the pooling variables --
@@ -251,7 +276,20 @@ class GCNHierarchical(torch.nn.Module):
         self.n_pool = n_pool
         self.use_bn = use_bn
         self.act_func = getattr(F,activation_function)
-        self.global_pool_func = eval(f"global_{global_pool_type}_pool")
+        
+        # -- for the pooling --
+        self.global_pool_type = global_pool_type
+        self.global_pool_func = getattr(gtu,f"global_{global_pool_type}_pool")
+        self.global_pool_weight = global_pool_weight
+        
+        # --- for the edge weights ---
+        self.edge_weight = edge_weight
+        if self.edge_weight is not None:
+            self.add_self_loops = False
+        else:
+            self.add_self_loops = True
+            
+        self.edge_weight_name = edge_weight_name
         
         # We inherit from pytorch geometric's GCN class, and we initialize three layers
         n_input_layer = dataset_num_node_features
@@ -281,7 +319,7 @@ class GCNHierarchical(torch.nn.Module):
                 n_input = n_hidden_channels_pool[i]
                 n_output = n_hidden_channels_pool[i+1]
                 
-                setattr(self,f"conv{i}{suffix}",GCNConv(n_input, n_output))
+                setattr(self,f"conv{i}{suffix}",GCNConv(n_input, n_output,add_self_loops=self.add_self_loops))
                 
                 if use_bn: 
                     setattr(self,
@@ -321,7 +359,14 @@ class GCNHierarchical(torch.nn.Module):
             for i in range(n_conv):
                 if debug_encode:
                     print(f"Working on Layer {i}")
-                x = getattr(self,f"conv{i}{suffix}")(x, edge_index)
+                    
+                if self.edge_weight:
+                    edge_weight = getattr(data,f"{self.edge_weight_name}{suffix}")
+                else:
+                    edge_weight = None
+                    
+                x = getattr(self,f"conv{i}{suffix}")(x, edge_index,
+                                                     edge_weight=edge_weight)
                 if self.use_bn:
                     x = getattr(self,f"bn{i}{suffix}")(x)
                 if (i < n_conv-1) and (pool_idx == self.n_pool - 1):
@@ -332,7 +377,10 @@ class GCNHierarchical(torch.nn.Module):
             
             # getting the pooling information
             next_pool = f"pool{pool_idx+1}"
-            pool_vec = getattr(data,next_pool,batch)
+            if pool_idx < self.n_pool - 1:
+                pool_vec = getattr(data,next_pool,batch)
+            else:
+                pool_vec = batch
             
 #             if pool_vec is None:
 #                 if debug_encode:
@@ -340,9 +388,21 @@ class GCNHierarchical(torch.nn.Module):
 #                 pool_vec = batch
             
             # getting the new feature matrix
-            x_pre = self.global_pool_func(x,pool_vec)
-            x_pool = getattr(data,f"x_{next_pool}",torch.Tensor([]))
-            x = torch.hstack([x_pre,x_pool])
+            # 2. Readout layer
+            if "weight" in self.global_pool_type:
+                weight_values = getattr(data,f"{self.global_pool_weight}_pool{pool_idx}")
+                x_pre = self.global_pool_func(x, pool_vec,weight_values)
+            else:
+                x_pre = self.global_pool_func(x, pool_vec)  # [batch_size, hidden_channels]
+        
+        
+            #x_pre = self.global_pool_func(x,pool_vec)
+            
+            try:
+                x_pool = getattr(data,f"x_{next_pool}",torch.Tensor([]))
+                x = torch.hstack([x_pre,x_pool])
+            except:
+                pass
             
             if pool_return == pool_idx + 1:
                 return x

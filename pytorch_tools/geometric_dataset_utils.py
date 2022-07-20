@@ -212,6 +212,7 @@ def load_data(
         else:
             y_int = np.array(label_int_map[y] ).reshape(1,-1)
 
+        #raise Exception("")
         if normalize:
             x = (x-col_means)/col_stds
 

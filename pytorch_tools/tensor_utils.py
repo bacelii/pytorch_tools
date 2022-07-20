@@ -31,4 +31,7 @@ def isnan(tensor):
     return torch.isnan(tensor)
 def isnan_any(tensor):
     return torch.any(torch.isnan(tensor))
+
+
+import tensor_utils as tenu
     
