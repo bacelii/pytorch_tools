@@ -460,7 +460,7 @@ def x_columns(
     if feature_name_suffix is None:
         feature_name_suffix= feature_name_suffix_global
     
-    return_cols =  [k for k in df.columns if k[:6] == x_prefix and k[-len(feature_name_suffix):] != feature_name_suffix]
+    return_cols =  [k for k in df.columns if k[:6] == x_prefix and feature_name_suffix not in k]
     
     if verbose:
         print(f"x_columns = {return_cols}")
@@ -474,7 +474,7 @@ def x_column_feature_name(
     if feature_name_suffix is None:
         feature_name_suffix= feature_name_suffix_global
         
-    return f"{column}_{feature_name_suffix}"
+    return f"{column[0]}_{feature_name_suffix}{column[1:]}"
     
 def normalization_df_hierarchical(
     df,

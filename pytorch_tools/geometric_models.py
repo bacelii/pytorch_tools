@@ -357,7 +357,11 @@ class GCNHierarchical(torch.nn.Module):
         self.lin = Linear(n_input_layer, dataset_num_classes)
         
                 
-    def encode(self,data,pool_return = None):
+    def encode(
+        self,
+        data,
+        pool_return = None,
+        batch_pool_before_return = True,):
         """
         Purpose: To encode the data to a certain pool range
         """
@@ -384,12 +388,19 @@ class GCNHierarchical(torch.nn.Module):
                 else:
                     edge_weight = None
                     
+                if debug_encode:
+                    print(f"edge_weight iter {i} = {edge_weight}")
+                    
                 x = getattr(self,f"conv{i}{suffix}")(x, edge_index,
                                                      edge_weight=edge_weight)
                 
                 if self.use_bn:
+                    if debug_encode:
+                        print(f"Using bn iter {i}")
                     x = getattr(self,f"bn{i}{suffix}")(x)
                 if (i < n_conv-1): # and (pool_idx == self.n_pool - 1):
+                    if debug_encode:
+                        print(f"Using act_fun {self.act_func} {i}")
                     x = self.act_func(x)
             
             if pool_return == 0:
@@ -400,13 +411,19 @@ class GCNHierarchical(torch.nn.Module):
                 weight_values = getattr(data,f"{self.global_pool_weight}_pool{pool_idx}")
             else:
                 weight_values = None
+                
+            if debug_encode:
+                print(f"Right before pooling weight_values = {weight_values}")
+                
+            #print(f'weight_values = {weight_values}')
             
             if self.n_pool == pool_idx:
                 return_x = self.global_pool_func(x,batch,weights=weight_values)
                 #print(f"return_x.shape = {return_x.shape}")
                 return return_x
             
-            
+            if debug_encode:
+                print(f"Did not return after first return")
             
             # getting the pooling information
             next_pool = f"pool{pool_idx+1}"
@@ -436,7 +453,10 @@ class GCNHierarchical(torch.nn.Module):
             
             if pool_return == pool_idx + 1:
                 if need_batch:
-                    return self.global_pool_func(x,batch,weights=weight_values)
+                    if batch_pool_before_return:
+                        return self.global_pool_func(x,batch,weights=weight_values)
+                    else:
+                        return x,batch
                 else:
                     return x
             
