@@ -7,3 +7,8 @@
 
     a. Monitoring the train/validation split early could help to monitor whether the overfitting will 
     happend soon or not
+    
+3) If you have more data then you could potentially increase the batch size and thus
+increase the learning rate
+
+- too small of a batch size on a large dataset may make the learner jump around too much 

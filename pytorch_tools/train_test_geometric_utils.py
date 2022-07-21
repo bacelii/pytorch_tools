@@ -12,7 +12,7 @@ import parameters_utils as paru
 import pandas as pd
 
 
-eps=1e-7
+eps=1e-13
 
 
 import tensor_utils as tsu
