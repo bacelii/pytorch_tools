@@ -1,0 +1,9 @@
+1) For dealing with large datasets that have small number of training sets: Can do following process
+    a. train on the small datasets
+    b. get the predicted labels for all datapoints
+    c. Train again using the datapoints that are high confidence
+    
+2) Rerunning a training with random initialization can really help with overfitting
+
+    a. Monitoring the train/validation split early could help to monitor whether the overfitting will 
+    happend soon or not

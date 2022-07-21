@@ -31,8 +31,9 @@ def forward_pass(
     return_predicted_labels = False,
     return_data_names = False,
     return_data_sources = False,
-    return_dict_for_embed = False,
     features_to_return = None,
+    return_dict_for_embed = False,
+    return_df = False,
     debug_nan = False):
     
     if type(loss_function) == str:
@@ -181,8 +182,18 @@ def forward_pass(
                 return_value.append(np.hstack(features_dict[f]))
                 return_value_names.append(f)
             
+            
+        return_dict = {k:v for k,v in zip(return_value_names,return_value)}
+        
+        if return_df:
+            df = pd.DataFrame(embeddings)
+            for k,v in return_dict.items():
+                if k == "embeddings":
+                    continue
+                df[k] = v
+            return df
         if return_dict_for_embed:
-            return {k:v for k,v in zip(return_value_names,return_value)}
+            return return_dict
         else:
             return return_value
         
