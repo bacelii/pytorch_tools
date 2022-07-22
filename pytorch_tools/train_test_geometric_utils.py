@@ -21,6 +21,7 @@ import tensor_utils as tsu
 def forward_pass(
     model,
     data_loader,
+    n_batches_per_update = 1,
     optimizer=None,
     model_name = None,
     mode = "train",
@@ -69,7 +70,8 @@ def forward_pass(
 
     features_dict = {k:[] for k in features_to_return}
     
-    loss_list = []
+    loss = 0
+    
     for jj,data in enumerate(data_loader):#train_loader:  # Iterate in batches over the training dataset.
         if debug_nan:
             print(f"\n\n------ iteration {jj}/{len(data_loader)}")
@@ -104,18 +106,27 @@ def forward_pass(
              
         
         if mode == "train":
-            loss = loss_function(
+            curr_loss = loss_function(
                 torch.log(out + eps), 
                 y_true,
                 weight = class_weights,
                 )  # Compute the loss.
-            loss_list.append(loss)
-            loss.backward()  # Derive gradients.
-            optimizer.step()  # Update parameters based on gradients.
-            optimizer.zero_grad()  # Clear gradients.
+            
+            loss += curr_loss
+            curr_loss.backward()  # Derive gradients.
+            if (jj % n_batches_per_update == n_batches_per_update-1):
+                #print(f"updating")
+                
+                optimizer.step()  # Update parameters based on gradients.
+                optimizer.zero_grad(set_to_none=True)  # Clear gradients.
+            else:
+                #print(f"Not updating")
+                
+                
+            
             if debug_nan:
                 paru.print_parameters(model)
-                print(f"loss = {loss}")
+                print(f"loss = {loss/(jj+1)}")
                 if paru.isnan_in_parameters(model):
                     raise Exception("Nan parameters")
                 
@@ -123,12 +134,12 @@ def forward_pass(
                 
         elif mode == "test":
             with torch.no_grad():
-                loss = loss_function(
+                curr_loss = loss_function(
                     torch.log(out + eps), 
                     y_true,
                     weight = class_weights,
                     )  # Compute the loss.
-            loss_list.append(loss)
+                loss += curr_loss
             y_pred = out.argmax(dim=1)  # Use the class with highest probability.
             y_pred_list.append(y_pred)
             y_true_list.append(y_true)
@@ -157,7 +168,7 @@ def forward_pass(
             
     
     if mode == "train":
-        return torch.hstack(loss_list).mean()
+        return loss/(jj+1)
     elif mode == "test":
         y_pred = torch.cat(y_pred_list)
         y_true = torch.cat(y_true_list)
@@ -167,7 +178,7 @@ def forward_pass(
             y_pred,
             tensor_map=tensor_map,
             metrics=["accuracy"],
-        ),torch.hstack(loss_list).mean()
+        ),loss/(jj+1)
     elif mode == "embed":
         embeddings = np.vstack(embeddings)
         labels = np.hstack(labels)
