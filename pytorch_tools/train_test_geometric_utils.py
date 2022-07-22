@@ -68,7 +68,8 @@ def forward_pass(
         features_to_return.append("data_source")
 
     features_dict = {k:[] for k in features_to_return}
-        
+    
+    loss_list = []
     for jj,data in enumerate(data_loader):#train_loader:  # Iterate in batches over the training dataset.
         if debug_nan:
             print(f"\n\n------ iteration {jj}/{len(data_loader)}")
@@ -100,12 +101,15 @@ def forward_pass(
             if tsu.isnan_any(out):
                 raise Exception("Nan output")
                 
+             
+        
         if mode == "train":
             loss = loss_function(
                 torch.log(out + eps), 
                 y_true,
                 weight = class_weights,
                 )  # Compute the loss.
+            loss_list.append(loss)
             loss.backward()  # Derive gradients.
             optimizer.step()  # Update parameters based on gradients.
             optimizer.zero_grad()  # Clear gradients.
@@ -118,9 +122,17 @@ def forward_pass(
                 
                 
         elif mode == "test":
+            with torch.no_grad():
+                loss = loss_function(
+                    torch.log(out + eps), 
+                    y_true,
+                    weight = class_weights,
+                    )  # Compute the loss.
+            loss_list.append(loss)
             y_pred = out.argmax(dim=1)  # Use the class with highest probability.
             y_pred_list.append(y_pred)
             y_true_list.append(y_true)
+            
         elif mode == "embed":
             out_array = out.detach().cpu().numpy()
             out_labels = data.y.numpy().reshape(-1)
@@ -145,7 +157,7 @@ def forward_pass(
             
     
     if mode == "train":
-        return loss
+        return torch.hstack(loss_list).mean()
     elif mode == "test":
         y_pred = torch.cat(y_pred_list)
         y_true = torch.cat(y_true_list)
@@ -155,7 +167,7 @@ def forward_pass(
             y_pred,
             tensor_map=tensor_map,
             metrics=["accuracy"],
-        )
+        ),torch.hstack(loss_list).mean()
     elif mode == "embed":
         embeddings = np.vstack(embeddings)
         labels = np.hstack(labels)

@@ -12,3 +12,19 @@
 increase the learning rate
 
 - too small of a batch size on a large dataset may make the learner jump around too much 
+
+batch rate observations: 
+1) Increasing the batch size helped with overfitting (train accuracy running away from validation)
+2) As got more data decreasing the batch size seemed to help the loss function from not fluctuating too much
+
+
+The way the proces goes:
+- runs batch
+- calculates loss
+- updates weights
+- next batch
+.....  can calculate the average loss over the whole training process
+
+At end of the epoch calculates the loss, accuracy,
+so the greater learning rate or the smaller the batch, the farther
+the average loss of the training process is farther from the loss of the end of epoch
