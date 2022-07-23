@@ -28,3 +28,9 @@ The way the proces goes:
 At end of the epoch calculates the loss, accuracy,
 so the greater learning rate or the smaller the batch, the farther
 the average loss of the training process is farther from the loss of the end of epoch
+
+
+ignore above:
+The big problem was that i was using a standardization method from previous dataset and
+some data in the new dataset had values that were much larger (and probably dominating the loss):
+-- ALWAYS CHECK THAT THE NORMALZIATION DATAFRAMES ARE SIMILAR ---

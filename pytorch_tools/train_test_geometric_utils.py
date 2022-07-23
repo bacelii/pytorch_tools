@@ -37,6 +37,8 @@ def forward_pass(
     return_df = False,
     debug_nan = False):
     
+    debug = False
+    
     if type(loss_function) == str:
         loss_function = getattr(F,loss_function)
     
@@ -71,7 +73,7 @@ def forward_pass(
     features_dict = {k:[] for k in features_to_return}
     
     loss = 0
-    
+    loss_for_update = []
     for jj,data in enumerate(data_loader):#train_loader:  # Iterate in batches over the training dataset.
         if debug_nan:
             print(f"\n\n------ iteration {jj}/{len(data_loader)}")
@@ -112,15 +114,20 @@ def forward_pass(
                 weight = class_weights,
                 )  # Compute the loss.
             
+            loss_for_update.append(curr_loss)
             loss += curr_loss
-            curr_loss.backward()  # Derive gradients.
+            
             if (jj % n_batches_per_update == n_batches_per_update-1):
-                #print(f"updating")
-                
+                if debug:
+                    print(f"updating")
+                t_loss = sum(loss_for_update)
+                t_loss.backward()  # Derive gradients.
                 optimizer.step()  # Update parameters based on gradients.
                 optimizer.zero_grad(set_to_none=True)  # Clear gradients.
+                loss_for_update=[]
             else:
-                #print(f"Not updating")
+                if debug:
+                    print(f"Not updating")
                 
                 
             
