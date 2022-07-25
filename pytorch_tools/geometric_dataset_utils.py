@@ -36,6 +36,10 @@ import preprocessing_utils as pret
 x_prefix_global = "x_pool"
 feature_name_suffix_global = "features"
 
+def example_data_obj():
+    return Data(x = torch.tensor(np.arange(30).reshape(6,-1)),edge_index = torch.tensor([[1,2],[2,3],[3,5],[3,4],[1,4],[5,6],[6,2]]).T-1,
+            pool1=torch.tensor([0,0,1,1,2,2]))
+
 def normalization_df(
     data_df,
     data_extraction_func,
@@ -992,6 +996,241 @@ def closest_neighbors_in_embedding_df(
         return_value = neighbors_dicts
         
     return return_value
+
+
+pool_attributes_affected_by_nodes = [
+    "node_weight_pool0",
+    "pool1",
+]
+
+from copy import deepcopy
+import tensor_utils as tenu
+
+def set_ptr(data,return_ptr = False):
+    """
+    Purpose: to compute the new ptr
+    if a batch is readjusted
+    """
+    ptr = torch.hstack([torch.tensor([0]),torch.where(data.batch[1:] - data.batch[:-1]>0)[0],torch.tensor(len(data.batch))])
+    if return_ptr:
+        return ptr
+    else:
+        data.ptr = ptr
+        
+def drop_nodes(
+    data,
+    mask=None,
+    p=None,
+    seed=None,
+    clone=True,
+    node_attributes_to_adjust = None,
+    verbose = False,):
+    """
+    Purpose: to delete certain nodes from a dataset
+    based on a mask
+    
+    Pseudocode: 
+    1) Generate the mask if not defined
+    2) Get the node_idx of the mask
+    3) Generate vector of the new node ids
+    
+    4) Find the new edges by dropping the edges with the nodes
+    and then finding the new edge
+    
+    Ex: 
+    from torch_geometric.data import Data
+    import numpy as np
+    import geometric_dataset_utils as gdu
+
+    d = gdu.example_data_obj()
+    new_d = gdu.drop_nodes(
+        d,
+        p=0.5,
+        verbose = True,
+        #node_attributes_to_adjust=pool_attributes_affected_by_nodes
+    )
+    
+    Ex: With a prescribed mask
+    
+    d = gdu.example_data_obj()
+    new_d = gdu.drop_nodes(
+        d,
+        mask = torch.tensor([0,0,1,0,0,0],dtype=torch.bool),
+        p=0.5,
+        verbose = True,
+        #node_attributes_to_adjust=pool_attributes_affected_by_nodes
+    )
+    """
+    verbose = True
+    debug_batch = True
+    if clone:
+        data = deepcopy(data)
+        
+    #data.batch.shape
+    if debug_batch:
+        print(f"Beginning")
+        print(f"data.x.shape = {data.x.shape}")
+        print(f"data.batch.shape = {data.batch.shape}")
+        print(f"data.ptr = {data.ptr}")
+        
+    
+    if node_attributes_to_adjust is None:
+        node_attributes_to_adjust = pool_attributes_affected_by_nodes
+        
+    node_attributes_to_adjust = nu.convert_to_array_like(pool_attributes_affected_by_nodes)
+    pool_attributes_affected_by_nodes.append("batch")
+        
+    n_nodes = data.x.shape[0]
+    if mask is None:
+        mask = tenu.random_mask(n_nodes,p=p,seed=seed)
+        if verbose:
+            print(f"filter_away_mask = {mask}")
+    
+    # new node ids to index into
+    previous_nodes = torch.arange(n_nodes)
+    new_node_ids = previous_nodes - tenu.cumsum(mask)
+    
+    if verbose:
+        print(f"new_node_ids = {new_node_ids}")
+    
+    # find the edges to keep:
+    nodes_dropped = previous_nodes[mask]
+    if verbose:
+        print(f"nodes_dropped ({len(nodes_dropped)}) = {nodes_dropped}")
+    
+    edge_idx_keep = torch.logical_not((tenu.intersect1d(data.edge_index[0],nodes_dropped,return_mask=True)
+                     | tenu.intersect1d(data.edge_index[1],nodes_dropped,return_mask=True)))
+    
+    if verbose:
+        edges_dropped = data.edge_index[:,~edge_idx_keep].T
+        print(f"edges dropped ({len(edges_dropped)})= {edges_dropped}")
+        
+    edges = data.edge_index[:,edge_idx_keep]
+    data.edge_index = new_node_ids[edges]
+    
+    if debug_batch:
+        print(f"Before x adjustment")
+        print(f"data.x.shape = {data.x.shape}")
+        print(f"data.batch.shape = {data.batch.shape}")
+        print(f"data.ptr = {data.ptr}")
+        
+    #--fixing all the node attributes
+    keep_mask = torch.logical_not(mask)
+    data.x = data.x[keep_mask,:]
+    #data.y = data.y[keep_mask]
+    
+#     if verbose:
+#         print(f"keep_mask = {keep_mask}")
+    if debug_batch:
+        print(f"After x adjustment")
+        print(f"data.x.shape = {data.x.shape}")
+        print(f"data.batch.shape = {data.batch.shape}")
+        print(f"data.ptr = {data.ptr}")
+        
+    
+    if node_attributes_to_adjust is not None:
+        for n in node_attributes_to_adjust:
+            curr_val = getattr(data,n,None)
+            if curr_val is None:
+                continue
+            try:
+                setattr(data,n,curr_val[keep_mask])
+            except:
+                pass
+            
+    # -- resolving the ptr
+    gdu.set_ptr(data)
+    
+    if debug_batch:
+        print(f"AFter node attributes adjustment")
+        print(f"data.x.shape = {data.x.shape}")
+        print(f"data.batch.shape = {data.batch.shape}")
+        print(f"data.ptr = {data.ptr}")
+        
+        
+    
+     
+    return data
+
+def pool_idx_stacked(
+    data,
+    pool_name = "pool1",
+    return_n_limbs_for_neuron = False,
+    return_adjustment = False):
+    """
+    Purpose: To generate a vector that represents the 
+    mapping of nodes to unique limbs
+    """
+    pool1 = getattr(data,pool_name)
+    print(f"data.ptr = {data.ptr}")
+    n_limbs_for_neuron = pool1[data.ptr[1:]-1]
+    
+    if return_n_limbs_for_neuron:
+        return n_limbs_for_neuron
+    adjust = (tenu.cumsum(n_limbs_for_neuron)[data.batch] - n_limbs_for_neuron[0])
+    if return_adjustment:
+        return adjust
+    else:
+        return  adjust + pool1
+
+def drop_limbs(
+    data,
+    mask=None,
+    p = None,
+    seed=None,
+    clone=True,
+    limb_map_attribute = "pool1",
+    verbose = False,
+    **kwargs
+    ):
+    """
+    Purpose: To drop limbs randomly from a dataset
+
+    Pseudocode: 
+    1) Get a mask for the limbs
+    2) Turn the mask of the limbs into a mask for the nodes
+    3) Use drop_nodes function
+    
+    Ex: 
+    new_d = gdu.drop_limbs(
+        data = gdu.example_data_obj(),
+        verbose = True,
+        p = 0.3
+    )
+    """
+    verbose = True
+    
+    if verbose:
+        print(f"Beginning of drop limbs")
+        print(f"data.x.shape = {data.x.shape}")
+        print(f"data.batch.shape = {data.batch.shape}")
+        print(f"data.ptr = {data.ptr}")
+    pool1 = gdu.pool_idx_stacked(data,limb_map_attribute)
+    
+    if verbose:
+        print(f"pool1.shape = {pool1.shape}")
+    n_limbs = int(torch.max(pool1)+1)
+    if verbose:
+        print(f"n_limbs = {n_limbs}")
+    
+    if mask is None:
+        mask = tenu.random_mask(n_limbs,p=p)
+        
+    limb_idx_to_drop = np.arange(n_limbs)[mask]
+    node_mask = tenu.intersect1d(pool1,limb_idx_to_drop,return_mask=True)
+
+    if verbose:
+        print(f"limb_idx_to_drop ({len(limb_idx_to_drop)}) = {limb_idx_to_drop}")
+        print(f"node_mask = {node_mask.shape}")
+        print("")
+    
+    return gdu.drop_nodes(
+        data,
+        mask=node_mask,
+        seed=seed,
+        clone=clone,
+        verbose = verbose,
+    )
 
 
 import geometric_dataset_utils as gdu

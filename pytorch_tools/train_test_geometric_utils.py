@@ -16,7 +16,7 @@ eps=1e-13
 
 
 import tensor_utils as tsu
-
+import data_augmentation_utils as dau
 
 def forward_pass(
     model,
@@ -29,18 +29,23 @@ def forward_pass(
     device = "cpu",
     tensor_map = None,
     class_weights = None,
+    augmentations = None,
     return_predicted_labels = False,
     return_data_names = False,
     return_data_sources = False,
     features_to_return = None,
     return_dict_for_embed = False,
     return_df = False,
-    debug_nan = False):
+    debug_nan = False,
+    verbose = False,):
     
     debug = False
     
     if type(loss_function) == str:
         loss_function = getattr(F,loss_function)
+        
+    if augmentations is not None:
+        aug_compose = dau.compose_augmentation(augmentations)
     
     if mode == "train":
         model.train()
@@ -75,9 +80,17 @@ def forward_pass(
     loss = 0
     loss_for_update = []
     for jj,data in enumerate(data_loader):#train_loader:  # Iterate in batches over the training dataset.
-        if debug_nan:
+        
+        if debug_nan or verbose:
             print(f"\n\n------ iteration {jj}/{len(data_loader)}")
         data = data.to(device)
+        
+        
+        if augmentations is not None:
+            #print(f"Data before augmentation = \n\t{data.x}")
+            data = aug_compose(data)
+            #print(f"Data after augmentation = \n\t{data.x}\n\n\n")
+            
         if model_name is not None:
             if "DiffPool" in model_name:
                 out,gnn_loss, cluster_loss = model(data)  # Perform a single forward pass.

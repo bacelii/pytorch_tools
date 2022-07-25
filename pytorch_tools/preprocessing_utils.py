@@ -5,7 +5,8 @@ def train_val_test_split(
     test_size = 0.2,
     val_size = 0.2,
     verbose = False,
-    return_dict = False
+    return_dict = False,
+    seed=None,
     ):
     
     total_num = len(dataset)
@@ -35,8 +36,10 @@ def train_val_test_split(
     if verbose:
         print(f"data_lengths_with_train = {data_lengths_with_train}")
     
-    
-    dataset_splits = torch.utils.data.random_split(dataset,data_lengths_with_train)
+    if seed is None:
+        dataset_splits = torch.utils.data.random_split(dataset,data_lengths_with_train)
+    else:
+        dataset_splits = torch.utils.data.random_split(dataset,data_lengths_with_train,generator=torch.Generator().manual_seed(seed))
     
     if return_dict:
         return {f"{k}_dataset":v for k,v in zip(data_names,dataset_splits)}
