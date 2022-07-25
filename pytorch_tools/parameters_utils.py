@@ -53,3 +53,8 @@ def isnan_in_parameters(model,verbose = False):
                 print(f"{name} nad nan values")
 
     return return_value
+
+def add_noise_to_parameters(model,noise_amplitude = 0.1 ):
+    with torch.no_grad():
+        for param in model.parameters():
+            param.add_(torch.randn(param.size()) * noise_amplitude)
