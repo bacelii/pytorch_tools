@@ -429,7 +429,7 @@ def compose_augmentation(
         if "str" in str(type(k)):
             aug_func.append(getattr(dau,k)(**kwargs))
         else:
-            aug_func.append(k(**kwargs))
+            aug_func.append(k)
             
     return dau.Compose(aug_func)
     
