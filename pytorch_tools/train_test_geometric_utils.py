@@ -15,7 +15,7 @@ import pandas as pd
 eps=1e-13
 
 
-import tensor_utils as tsu
+import tensor_utils as tenu
 import data_augmentation_utils as dau
 
 def forward_pass(
@@ -115,7 +115,7 @@ def forward_pass(
         #print(f"out.min() = {out.min()}, out.max() = {out.max()}")
         if debug_nan:
             print(f"out= {out}")
-            if tsu.isnan_any(out):
+            if tenu.isnan_any(out):
                 raise Exception("Nan output")
                 
              

@@ -1017,6 +1017,7 @@ def set_ptr(data,return_ptr = False):
     else:
         data.ptr = ptr
         
+import time
 def drop_nodes(
     data,
     mask=None,
@@ -1024,7 +1025,8 @@ def drop_nodes(
     seed=None,
     clone=True,
     node_attributes_to_adjust = None,
-    verbose = False,):
+    verbose = False,
+    debug_time = False,):
     """
     Purpose: to delete certain nodes from a dataset
     based on a mask
@@ -1061,8 +1063,9 @@ def drop_nodes(
         #node_attributes_to_adjust=pool_attributes_affected_by_nodes
     )
     """
-    verbose = True
-    debug_batch = True
+    st = time.time()
+    debug_batch = False
+    debug_time = False
     if clone:
         data = deepcopy(data)
         
@@ -1075,31 +1078,54 @@ def drop_nodes(
         
     
     if node_attributes_to_adjust is None:
-        node_attributes_to_adjust = pool_attributes_affected_by_nodes
+        node_attributes_to_adjust = pool_attributes_affected_by_nodes.copy()
         
-    node_attributes_to_adjust = nu.convert_to_array_like(pool_attributes_affected_by_nodes)
-    pool_attributes_affected_by_nodes.append("batch")
+    
+        
+    node_attributes_to_adjust = nu.convert_to_array_like(node_attributes_to_adjust)
+    node_attributes_to_adjust.append("batch")
         
     n_nodes = data.x.shape[0]
     if mask is None:
         mask = tenu.random_mask(n_nodes,p=p,seed=seed)
         if verbose:
             print(f"filter_away_mask = {mask}")
+    # -- want to check that no neuron is completely filtered away
+    # -- and if so then adds back the nodes ----
+    """
+    Psuedocode: 
+    1) Use the mask to index to the batch to get the leftover batches
+    2) Get the batches that are totally eliminated
+    
+    """
+    
     
     # new node ids to index into
     previous_nodes = torch.arange(n_nodes)
     new_node_ids = previous_nodes - tenu.cumsum(mask)
     
+    if debug_time:
+        print(f"New nodes id time: {time.time() - st}")
+    
     if verbose:
         print(f"new_node_ids = {new_node_ids}")
+        st = time.time()
     
     # find the edges to keep:
     nodes_dropped = previous_nodes[mask]
     if verbose:
         print(f"nodes_dropped ({len(nodes_dropped)}) = {nodes_dropped}")
+        
+    if debug_time:
+        print(f"Node dropped time: {time.time() - st}")
+        st = time.time()
     
     edge_idx_keep = torch.logical_not((tenu.intersect1d(data.edge_index[0],nodes_dropped,return_mask=True)
                      | tenu.intersect1d(data.edge_index[1],nodes_dropped,return_mask=True)))
+    
+    if debug_time:
+        print(f"Edge_idx_keep time: {time.time() - st}")
+        st = time.time()
     
     if verbose:
         edges_dropped = data.edge_index[:,~edge_idx_keep].T
@@ -1119,6 +1145,10 @@ def drop_nodes(
     data.x = data.x[keep_mask,:]
     #data.y = data.y[keep_mask]
     
+    if debug_time:
+        print(f"Setting x data: {time.time() - st}")
+        st = time.time()
+    
 #     if verbose:
 #         print(f"keep_mask = {keep_mask}")
     if debug_batch:
@@ -1136,10 +1166,20 @@ def drop_nodes(
             try:
                 setattr(data,n,curr_val[keep_mask])
             except:
-                pass
+                if n == "batch":
+                    pass
+                else:
+                    raise Exception("")
+                    
+            if debug_time:
+                print(f"Setting attribute {n}: {time.time() - st}")
+                st = time.time()
             
     # -- resolving the ptr
     gdu.set_ptr(data)
+    if debug_time:
+        print(f"Setting pointer: {time.time() - st}")
+        st = time.time()
     
     if debug_batch:
         print(f"AFter node attributes adjustment")
@@ -1162,7 +1202,6 @@ def pool_idx_stacked(
     mapping of nodes to unique limbs
     """
     pool1 = getattr(data,pool_name)
-    print(f"data.ptr = {data.ptr}")
     n_limbs_for_neuron = pool1[data.ptr[1:]-1]
     
     if return_n_limbs_for_neuron:
@@ -1198,16 +1237,16 @@ def drop_limbs(
         p = 0.3
     )
     """
-    verbose = True
+    debug_verbose = False
     
-    if verbose:
+    if debug_verbose:
         print(f"Beginning of drop limbs")
         print(f"data.x.shape = {data.x.shape}")
         print(f"data.batch.shape = {data.batch.shape}")
         print(f"data.ptr = {data.ptr}")
     pool1 = gdu.pool_idx_stacked(data,limb_map_attribute)
     
-    if verbose:
+    if debug_verbose:
         print(f"pool1.shape = {pool1.shape}")
     n_limbs = int(torch.max(pool1)+1)
     if verbose:
@@ -1219,7 +1258,7 @@ def drop_limbs(
     limb_idx_to_drop = np.arange(n_limbs)[mask]
     node_mask = tenu.intersect1d(pool1,limb_idx_to_drop,return_mask=True)
 
-    if verbose:
+    if debug_verbose:
         print(f"limb_idx_to_drop ({len(limb_idx_to_drop)}) = {limb_idx_to_drop}")
         print(f"node_mask = {node_mask.shape}")
         print("")
