@@ -265,6 +265,9 @@ class GCNHierarchical(torch.nn.Module):
         add_self_loops = None,
         
         verbose = True,
+        aggregate_layer_outputs = False,
+        aggregate_layer_outputs_func = "concatenate",
+        residual_connections = False,
         #-- example of how to define the pooling variables --
         #n_hidden_channels_pool0
         #n_layers_pool0
@@ -272,6 +275,13 @@ class GCNHierarchical(torch.nn.Module):
         #num_node_features_pool2
         **kwargs
         ):
+        
+        self.residual_connections = residual_connections
+        self.aggregate_layer_outputs = aggregate_layer_outputs
+        self.aggregate_layer_outputs_func = aggregate_layer_outputs_func
+        
+        if n_pool != 0 and self.aggregate_layer_outputs:
+            raise Exception("")
         
         super(GCNHierarchical, self).__init__()
         self.n_pool = n_pool
@@ -306,10 +316,13 @@ class GCNHierarchical(torch.nn.Module):
         else:
             self.pool_iter = n_pool
             
+        n_hidden_channels_for_aggregator = []
         for pool_idx in range(self.pool_iter):
             suffix = f"_pool{pool_idx}"
             n_hidden_channels_pool = kwargs.get(f"n_hidden_channels_pool{pool_idx}",
                                                n_hidden_channels)
+            
+            
             
             if n_hidden_channels_pool is None:
                 raise Exception("")
@@ -328,6 +341,8 @@ class GCNHierarchical(torch.nn.Module):
             if verbose:
                 print(f"Pool {pool_idx} n_hidden_channels_pool = {n_hidden_channels_pool}")
             for i in range(len(n_hidden_channels_pool)-1):
+                n_hidden_channels_for_aggregator.append(n_hidden_channels_pool[i+1])
+                
                 n_input = n_hidden_channels_pool[i]
                 n_output = n_hidden_channels_pool[i+1]
                 
@@ -354,7 +369,12 @@ class GCNHierarchical(torch.nn.Module):
                 )
             
         # now have to do the linear layers
-        self.lin = Linear(n_input_layer, dataset_num_classes)
+        if self.aggregate_layer_outputs:
+            lin_n_layers = sum(n_hidden_channels_for_aggregator)
+        else:
+            lin_n_layers = n_input_layer
+            
+        self.lin = Linear(lin_n_layers, dataset_num_classes)
         
                 
     def encode(
@@ -372,6 +392,7 @@ class GCNHierarchical(torch.nn.Module):
         x, edge_index = data.x, data.edge_index
         batch = getattr(data,"batch",None)
         
+        all_layer_x = []
         for pool_idx in range(self.pool_iter):
             if debug_encode:
                 print(f"Working on Pool {pool_idx}")
@@ -391,6 +412,9 @@ class GCNHierarchical(torch.nn.Module):
                 if debug_encode:
                     print(f"edge_weight iter {i} = {edge_weight}")
                     
+                if self.residual_connections:
+                    x_old = x.clone()
+                    
                 x = getattr(self,f"conv{i}{suffix}")(x, edge_index,
                                                      edge_weight=edge_weight)
                 
@@ -402,6 +426,13 @@ class GCNHierarchical(torch.nn.Module):
                     if debug_encode:
                         print(f"Using act_fun {self.act_func} {i}")
                     x = self.act_func(x)
+                    
+                if self.aggregate_layer_outputs:
+                    all_layer_x.append(x.clone())
+                    
+                if self.residual_connections:
+                    x = torch.mean([x,x_old])
+                    
             
             if pool_return == 0:
                 return x
@@ -418,6 +449,14 @@ class GCNHierarchical(torch.nn.Module):
             #print(f'weight_values = {weight_values}')
             
             if self.n_pool == pool_idx:
+                if self.aggregate_layer_outputs:
+                    if self.aggregate_layer_outputs_func == "concatenate":
+                        x = torch.hstack(all_layer_x)
+                    elif self.aggregate_layer_outputs_func == "mean":
+                        x = torch.sum(all_layer_x)/len(all_layer_x)
+                    else:
+                        raise Exception("")
+                        
                 return_x = self.global_pool_func(x,batch,weights=weight_values)
                 #print(f"return_x.shape = {return_x.shape}")
                 return return_x
@@ -887,6 +926,9 @@ class GAT(nn.Module):
         dropout=0.6,
         activation_function = "elu",
         
+        use_bn = True,
+        track_running_stats=True,
+        
         #parameters for the GAT
         heads=2, 
         first_heads=None,
@@ -895,19 +937,31 @@ class GAT(nn.Module):
     
         #--- parameters for size of classifier
         classifier_type = "Flat",
-        classifier_n_hidden = None,):
+        classifier_n_hidden = None,
+        **kwargs):
+        
         super(GAT, self).__init__()
         
+        self.use_bn = use_bn 
         if first_heads is not None:
             conv0_heads = first_heads
         else:
             conv0_heads = heads
         self.conv0 = GATConv(dataset_num_node_features, n_hidden_channels,
                            heads=conv0_heads, dropout=dropout)
+        if self.use_bn:
+            setattr(self,f"bn0",
+                           torch.nn.BatchNorm1d(
+                                    n_hidden_channels*conv0_heads,
+                                    track_running_stats=track_running_stats
+                        ))
         
         self.act_func = getattr(F,activation_function)
         
         prev_heads = conv0_heads
+        
+        
+        
         for i in range(1,n_layers):
             if output_heads is not None:
                 convN_heads = output_heads
@@ -916,6 +970,12 @@ class GAT(nn.Module):
             setattr(self,f"conv{i}",GATConv(n_hidden_channels*prev_heads, n_hidden_channels,
                            heads=convN_heads, dropout=dropout))
             prev_heads = convN_heads
+            if use_bn:
+                setattr(self,f"bn{i}",
+                       torch.nn.BatchNorm1d(
+                                n_hidden_channels*convN_heads,
+                                track_running_stats=track_running_stats
+                    ))
             
         self.dropout = dropout
         if global_pool_type is not None:
@@ -951,8 +1011,11 @@ class GAT(nn.Module):
         for i in range(self.n_conv):
             x = F.dropout(x, p=self.dropout, training=self.training)
             x = getattr(self,f"conv{i}")(x, edge_index)
+            if self.use_bn:
+                x = getattr(self,f"bn{i}")(x)
             if i < self.n_conv-1:
                 x = self.act_func(x)
+            
         
         if self.global_pool_func is not None:
             x = self.global_pool_func(x, batch)
