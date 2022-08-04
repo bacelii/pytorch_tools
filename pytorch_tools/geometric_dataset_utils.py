@@ -665,8 +665,11 @@ def pytorch_data_hierarchical_from_single_data(
             dtype = torch.float
         else:
             dtype=torch.long
-            
-        curr_val = torch.tensor(data_dict[k],dtype=dtype)
+        
+        try:
+            curr_val = torch.tensor(data_dict[k],dtype=dtype)
+        except:
+            curr_val = torch.tensor(data_dict[k].astype("float"),dtype=dtype)
         if "edge_index" in k:
             curr_val = curr_val.T
             

@@ -387,7 +387,7 @@ class GCNHierarchical(torch.nn.Module):
         """
         debug_encode = False
         if pool_return is None:
-            pool_return = self.pool_iter
+            pool_return = self.n_pool# self.pool_iter
         
         x, edge_index = data.x, data.edge_index
         batch = getattr(data,"batch",None)
@@ -434,21 +434,25 @@ class GCNHierarchical(torch.nn.Module):
                     x = torch.mean([x,x_old])
                     
             
-            if pool_return == 0:
+            if pool_return == -1:
                 return x
             
             # calculating the weights
-            if "weight" in self.global_pool_type:
-                weight_values = getattr(data,f"{self.global_pool_weight}_pool{pool_idx}")
-            else:
-                weight_values = None
+#             if "weight" in self.global_pool_type:
+#                 weight_values = getattr(data,f"{self.global_pool_weight}_pool{pool_idx}")
+#             else:
+#                 weight_values = None
+            
+            weight_values = getattr(data,f"{self.global_pool_weight}_pool{pool_idx}",None)
+            if weight_values is None:
+                weight_values = getattr(data,f"{self.global_pool_weight}",None)
                 
             if debug_encode:
                 print(f"Right before pooling weight_values = {weight_values}")
                 
             #print(f'weight_values = {weight_values}')
             
-            if self.n_pool == pool_idx:
+            if self.n_pool == pool_idx and pool_return <= self.n_pool:
                 if self.aggregate_layer_outputs:
                     if self.aggregate_layer_outputs_func == "concatenate":
                         x = torch.hstack(all_layer_x)
@@ -483,7 +487,10 @@ class GCNHierarchical(torch.nn.Module):
             
             x_pre = self.global_pool_func(x, pool_vec,weights=weight_values)
             x_pool = getattr(data,f"x_{next_pool}",torch.Tensor([]))
+            #print(f"x_pool = {x_pool}")
             x = torch.hstack([x_pre,x_pool])
+            
+            
             
             
             #getting new edge index
@@ -501,12 +508,25 @@ class GCNHierarchical(torch.nn.Module):
             
             
             
-    def forward(self, data):
-        x = self.encode(data)
+    def forward(self, data,classifier_layer = True,**kwargs,):
+        #print(f"classifier_layer = {classifier_layer}")
+        #print(f"kwargs = {kwargs}")
+        x = self.encode(data,**kwargs)
         # 3. Apply a final classifier
-        x = F.dropout(x, p=0.5, training=self.training)
-        x = self.lin(x)
-        return F.softmax(x,dim=1)
+        if classifier_layer:
+            if len(x) == 2:
+                x,batch = x
+            else:
+                batch = None
+            x = F.dropout(x, p=0.5, training=self.training)
+            x = self.lin(x)
+            
+            if batch is None:
+                return F.softmax(x,dim=1)
+            else:
+                return F.softmax(x,dim=1),batch
+        else:
+            return x
 
 
 
