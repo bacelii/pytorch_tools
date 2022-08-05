@@ -8,7 +8,8 @@ def save_checkpoint(
     filepath,
     optimizer = None,
     epoch = None,
-    loss = None,):
+    loss = None,
+    **kwargs):
     
     save_dict = dict()
     save_dict[model_save_name] = model.state_dict()
@@ -21,6 +22,9 @@ def save_checkpoint(
     if loss is not None:
         save_dict["loss"] = loss
         
+    for k,v in kwargs.items():
+        save_dict[k] = v
+        
     torch.save(save_dict,filepath)
         
 def load_checkpoint_to_model(filepath,model):
@@ -30,4 +34,4 @@ def load_checkpoint_to_model(filepath,model):
     return model
     
 
-import model_utils as mdl
+import model_utils as mdlu

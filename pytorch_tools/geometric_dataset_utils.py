@@ -455,6 +455,7 @@ def x_columns(
     df,
     x_prefix = None,
     feature_name_suffix = None,
+    columns_to_ignore = None,
     verbose = False,
     **kwargs
     ):
@@ -465,6 +466,9 @@ def x_columns(
         feature_name_suffix= feature_name_suffix_global
     
     return_cols =  [k for k in df.columns if k[:6] == x_prefix and feature_name_suffix not in k]
+    
+    if columns_to_ignore is not None:
+        return_cols = np.setdiff1d(return_cols,columns_to_ignore)
     
     if verbose:
         print(f"x_columns = {return_cols}")
@@ -553,7 +557,8 @@ def normalize_and_filter_x_columns(
     df,
     normalization_df=None,
     columns_to_keep = None,
-    columns_to_delete = None,):
+    columns_to_delete = None,
+    columns_to_ignore = None,):
     """
     Purpose: To normalize and filter the
     x features
@@ -576,7 +581,7 @@ def normalize_and_filter_x_columns(
         )
 
     new_df = []
-    x_cols = gdu.x_columns(df)
+    x_cols = gdu.x_columns(df,columns_to_ignore=columns_to_ignore)
     for k in tqdm(pu.df_to_dicts(df)):
         for x_c in x_cols:
             f_name = gdu.x_column_feature_name(x_c)
