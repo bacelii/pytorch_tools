@@ -127,6 +127,8 @@ def drop_nodes(
         #node_attributes_to_adjust=pool_attributes_affected_by_nodes
     )
     """
+    verbose = False
+    
     st = time.time()
     debug_batch = False
     debug_time = False
@@ -153,7 +155,7 @@ def drop_nodes(
     if mask is None:
         mask = tenu.random_mask(n_nodes,p=p,seed=seed)
         if verbose:
-            print(f"filter_away_mask = {mask}")
+            print(f"filter_away_mask = {torch.where(mask)}")
     # -- want to check that no neuron is completely filtered away
     # -- and if so then adds back the nodes ----
     """

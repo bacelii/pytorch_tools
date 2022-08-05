@@ -2,9 +2,10 @@ import torch
 
 import torch_geometric.nn as nn 
 #global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
+import tensor_utils as tenu
 
 import torch_geometric.nn as nn_geo
-def global_mean_weighted_pool(x,batch,weights):
+def global_mean_weighted_pool(x,batch,weights,debug_nan = False):
     """
     Purpose: To do a weighted mean pooling for 
     a batch
@@ -17,9 +18,27 @@ def global_mean_weighted_pool(x,batch,weights):
     tenu.global_mean_weighted_pool(x,batch,w)
     """
     weights = (weights.unsqueeze(1))
+    if debug_nan:
+        if tenu.isnan_any(batch):
+            raise Exception(f"Nan batch")
     weight_sum = nn_geo.global_add_pool(weights,batch)
+    
+    
+    if debug_nan:
+        if tenu.isnan_any(weight_sum):
+            raise Exception(f"Nan weight_sum")
     weighted_value_sum = nn_geo.global_add_pool(x*weights,batch)
-    return weighted_value_sum/weight_sum
+    if debug_nan:
+        if tenu.isnan_any(weighted_value_sum):
+            raise Exception(f"Nan weighted_value_sum")
+    
+    weight_result = weighted_value_sum/weight_sum
+    weight_result[weight_result != weight_result] = 0
+    
+    if debug_nan:
+        if tenu.isnan_any(weight_result):
+            raise Exception(f"Nan weight_result")
+    return weight_result
 
 def global_mean_pool(x,batch,**kwargs):
     return nn_geo.global_mean_pool(x,batch)

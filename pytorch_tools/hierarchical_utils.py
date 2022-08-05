@@ -63,10 +63,15 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         # linear layer training
         dropout_p = 0.5,
 
+        return_pool_after_pool1 = False,
+        return_pool_after_pool1_method = "mean",
         
         verbose = True,
         **kwargs
         ):
+        
+        self.return_pool_after_pool1 = return_pool_after_pool1
+        self.return_pool_after_pool1_method = return_pool_after_pool1_method
         
         super(GCNHierarchicalClassifier, self).__init__()
         self.n_pool = 2
@@ -98,6 +103,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         
         self.dropout_p = dropout_p
         
+        self.num_node_features_pool1 = num_node_features_pool1
         
         # --- architecture ----
         n_input_layer = dataset_num_node_features
@@ -173,6 +179,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         self,
         data,
         debug_encode = False,
+        debug_nan = False,
         ):
         
         """
@@ -188,6 +195,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         5) Pool the nodes together
         6) Pass through classifier
         """
+        #print(f"debug_nan = {debug_nan}")
         
         x, edge_index = data.x, data.edge_index
         batch = getattr(data,"batch",None)
@@ -222,14 +230,26 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 x = getattr(self,f"conv{i}{suffix}")(x, edge_index,
                                                      edge_weight=edge_weight)
                 
+                if debug_nan:
+                    if tenu.isnan_any(x):
+                        raise Exception(f"Nan output gcn, pool_idx {pool_idx} gnc layer {i}")
+                
                 if self.use_bn:
                     if debug_encode:
                         print(f"Using bn iter {i}")
                     x = getattr(self,f"bn{i}{suffix}")(x)
+                    
+                    if debug_nan:
+                        if tenu.isnan_any(x):
+                            raise Exception(f"Nan output batch norm, pool_idx {pool_idx} gnc layer {i}")
                 if (i < n_conv-1): # and (pool_idx == self.n_pool - 1):
                     if debug_encode:
                         print(f"Using act_fun {self.act_func} {i}")
                     x = self.act_func(x)
+                    
+                    if debug_nan:
+                        if tenu.isnan_any(x):
+                            raise Exception(f"Nan output acti norm, pool_idx {pool_idx} gnc layer {i}")
                     
                 if self.aggregate_layer_outputs:
                     all_layer_x.append(x.clone())
@@ -275,14 +295,47 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             if debug_encode:
                 print(f"Right before pool func: {self.global_pool_func.__name__}")
                 
-            x = self.global_pool_func(x, pool_vec,weights=weight_values)
+#             print(f"x.shape = {x.shape}")
+#             print(f"pool_vec.shape = {pool_vec.shape}")
+#             print(f"weight_values = {weight_values.shape}")
+            
+            if debug_nan:
+                if tenu.isnan_any(x):
+                    raise Exception(f"Nan output x, pool_idx {pool_idx} gnc layer {i}")
+            
+            if debug_nan:
+                if tenu.isnan_any(weight_values):
+                    raise Exception(f"Nan output weight_values, pool_idx {pool_idx} gnc layer {i}")
+                    
+            if debug_nan:
+                if tenu.isnan_any(pool_vec):
+                    raise Exception(f"Nan output pool_vec, pool_idx {pool_idx} gnc layer {i}")
+                    
+            x = self.global_pool_func(x, pool_vec,weights=weight_values,debug_nan=debug_nan)
+            
+            if debug_nan:
+                if tenu.isnan_any(x):
+                    raise Exception(f"Nan output weighted pool, pool_idx {pool_idx} gnc layer {i}")
             
             
             # Feed into classifier
             x = F.dropout(x, p=self.dropout_p, training=self.training)
             
+            if debug_nan:
+                if tenu.isnan_any(x):
+                    raise Exception(f"Nan output dropout, pool_idx {pool_idx} gnc layer {i}")
+            
             x = getattr(self,f"lin{suffix}")(x)
+            
+            if debug_nan:
+                if tenu.isnan_any(x):
+                    raise Exception(f"Nan output linear layer, pool_idx {pool_idx} gnc layer {i}")
+                    
             x = F.softmax(x,dim=1)
+            
+            if debug_nan:
+                if tenu.isnan_any(x):
+                    raise Exception(f"Nan output softmax, pool_idx {pool_idx} gnc layer {i}")
             
             if pool_idx == self.n_pool - 1:
                 return x_0,x
@@ -290,13 +343,23 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             x_0 = x.clone()
             
             x_pool = getattr(data,f"x_{next_pool}",torch.Tensor([]))
+            batch = global_mean_pool(batch,pool_vec)
+            
+            if self.return_pool_after_pool1:
+                #print(f"Returning ealry")
+                #print(f"x_0.shape = {x_0.shape}")
+                x_1 = getattr(gtu,f"global_{self.return_pool_after_pool1_method}_pool")(x_0,batch)
+                #print(f"x_1.shape = {x_1.shape}")
+                return x_0,x_1
+            
             #print(f"x_pool = {x_pool}")
-            x = torch.hstack([x,x_pool])
+            if eval(f"self.num_node_features_{next_pool}") > 0: 
+                x = torch.hstack([x,x_pool])
             
             #getting new edge index
             edge_index = getattr(data,f"edge_index_{next_pool}",None)
             
-            batch = global_mean_pool(batch,pool_vec)
+            
             
     def forward(self,data,**kwargs):
         return self.encode(data,**kwargs)
@@ -330,28 +393,49 @@ def hierarchical_loss(
     loss_pool2_weight = 1,
     return_separate_loss = False,
     debug = False,
+    debug_nan = False,
     ):
     
-    print(f"loss_pool1_weight = {loss_pool1_weight}")
+    #print(f"loss_pool1_weight = {loss_pool1_weight}")
     
+    if debug_nan:
+        if tenu.isnan_any(x1):
+            raise Exception("Nan output x1")
+    
+    if debug_nan:
+        if tenu.isnan_any(y1):
+            raise Exception("Nan output y1")
     loss_pool1 = loss_function(
         torch.log(x1 + eps), 
         y1,
         weight = class_weights,
         reduction = "none"
         )
+    
+    if debug_nan:
+        if tenu.isnan_any(loss_pool1):
+            raise Exception("Nan output loss_pool1")
 
     if debug:
         print(f"x1= {x1.shape}")
         print(f"y1= {y1.shape}")
     
+    if debug_nan:
+        if tenu.isnan_any(y1):
+            raise Exception("Nan output y1")
     
     if loss_pool1_weight_by_pool2_group:
         loss_pool1 = loss_pool1 * gtu.normalize_in_pool_from_pool_tensor(
             global_mean_pool(data.batch,data.pool1)
         )
+        
+        
     else:
         loss_pool1 = loss_pool1 / len(y2)
+        
+    if debug_nan:
+        if tenu.isnan_any(loss_pool1):
+            raise Exception("Nan output loss_pool1")
         
 #     if debug:
 #         print(f"data.x_pool1 = {data.x_pool1}")
@@ -359,6 +443,14 @@ def hierarchical_loss(
     loss_pool1 = loss_pool1 * loss_pool1_weight
 
     # need to adjust the  loss_pool1
+    
+    if debug_nan:
+        if tenu.isnan_any(x2):
+            raise Exception("Nan output x2")
+            
+    if debug_nan:
+        if tenu.isnan_any(y2):
+            raise Exception("Nan output y2")
 
     loss_pool2 = loss_function(
         torch.log(x2 + eps), 
@@ -394,7 +486,8 @@ def forward_pass(
     return_predicted_labels = False,
     return_data_names = False,
     return_data_sources = False,
-    features_to_return = None,
+    features_to_return_1 = None,
+    features_to_return_2 = None,
     return_dict_for_embed = False,
     return_df = False,
     debug_nan = False,
@@ -434,20 +527,30 @@ def forward_pass(
     
     
     # for storing all of the attributes requested to be returned
-    if features_to_return is not None:
-        if "str" in str(type(features_to_return)):
-            features_to_return = [features_to_return]
+    if features_to_return_1 is not None:
+        if "str" in str(type(features_to_return_1)):
+            features_to_return_1 = [features_to_return_1]
     else:
-        features_to_return = []
+        features_to_return_1 = []
         
+    if features_to_return_2 is not None:
+        if "str" in str(type(features_to_return_2)):
+            features_to_return_2 = [features_to_return_2]
+    else:
+        features_to_return_2 = []
+        
+    
     if return_data_names:
-        features_to_return += ["data_name","name"]
+        features_to_return_1 += ["name"]
+        features_to_return_2 += ["name"]
         
     if return_data_sources:
-        features_to_return.append("data_source")
+        features_to_return_1.append("data_source")
+        features_to_return_2.append("data_source")
         
         
-    features_dict = {k:[] for k in features_to_return}
+    features_dict_1 = {k:[] for k in features_to_return_1}
+    features_dict_2 = {k:[] for k in features_to_return_2}
     
     loss = 0
     loss_1 = 0
@@ -455,9 +558,7 @@ def forward_pass(
     loss_for_update = []
     
     for jj,data in enumerate(data_loader):
-        batch = getattr(data,"batch",None)
-        if batch is None:
-            batch=torch.zeros(len(data.x),dtype=torch.int64)
+        
         
         if debug_nan or verbose:
             print(f"\n\n------ iteration {jj}/{len(data_loader)}")
@@ -469,8 +570,16 @@ def forward_pass(
             data = aug_compose(data)
             #print(f"Data after augmentation = \n\t{data.x}\n\n\n")
             
+        batch = getattr(data,"batch",None)
+        if batch is None:
+            batch=torch.zeros(len(data.x),dtype=torch.int64)
+            
+        if debug_nan:
+            if tenu.isnan_any(data.x):
+                raise Exception("Nan output")
+            
         # -- get the output of the model
-        x1,x2 = model(data)
+        x1,x2 = model(data,debug_nan=debug_nan)
         
         # --- getting what the y values should have been
         y2 = data.y.squeeze_()
@@ -503,6 +612,7 @@ def forward_pass(
                 loss_pool2_weight = loss_pool2_weight,
                 return_separate_loss = True,
                 debug = False,
+                debug_nan = debug_nan,
                 )
             
             curr_loss = curr_loss_1 + curr_loss_2
@@ -543,7 +653,8 @@ def forward_pass(
                     loss_pool1_weight_by_pool2_group = loss_pool1_weight_by_pool2_group,
                     loss_pool1_weight = loss_pool1_weight,
                     loss_pool2_weight = loss_pool2_weight,
-                    return_separate_loss = True
+                    return_separate_loss = True,
+                    debug_nan = debug_nan,
                     )
                 
                 curr_loss = curr_loss_1 + curr_loss_2
@@ -564,19 +675,34 @@ def forward_pass(
             y_true_list_2.append(y2)
             
         elif mode == "embed":
-            embeddings_1.append(x1.detach().cpu().numpy())
+
+            curr_embed_1 = x1.detach().cpu().numpy()
+            embeddings_1.append(curr_embed_1)
             labels_1.append(y1.numpy().reshape(-1))
             
-            embeddings_2.append(x2.detach().cpu().numpy())
+            
+            #print(f"curr_embed_1.shape = {curr_embed_1.shape}")
+            
+            curr_embed_2 = x2.detach().cpu().numpy()
+            embeddings_2.append(curr_embed_2)
             labels_2.append(y2.numpy().reshape(-1))
             
+            #print(f"curr_embed_2.shape = {curr_embed_2.shape}")
+            
+            for f in features_dict_1:
+                curr_data = getattr(data,f)
+                if "pool" in f:
+                    curr_data = np.array(curr_data)
+                else:
+                    index_vec = gtu.global_mean_pool(data.batch,data.pool1)
+                    curr_data = np.array(curr_data)[index_vec]
+
+                features_dict_1[f].append(curr_data)
+                #print(f"{f}: {curr_data.shape}")
+            
+            for f in features_dict_2:
+                features_dict_2[f].append(getattr(data,f))
                 
-            if features_to_return is not None:
-                for f in features_to_return:
-                    try:
-                        features_dict[f].append(getattr(data,f))
-                    except:
-                        pass
         else:
             raise Exception("Unknown mode")
             
@@ -617,36 +743,60 @@ def forward_pass(
         embeddings_2 = np.vstack(embeddings_2)
         labels_2 = np.hstack(labels_2)
         
-        return_value = [np.vstack(embeddings_1),
-                        np.hstack(labels_1),
+        return_value_1 = [np.vstack(embeddings_1),
+                        np.hstack(labels_1),]
+        return_value_2 = [
                         np.vstack(embeddings_2),
                        np.hstack(labels_2)]
-        return_value_names = [
-            "embeddings_1",
-            "labels_1",
-            "embeddings_2",
-            "labels_2",]
         
-        if features_to_return is not None:
-            for f in features_to_return:
-                if len(features_dict[f]) == 0:
-                    continue
-                return_value.append(np.hstack(features_dict[f]))
-                return_value_names.append(f)
+        return_value_names_1 = [
+            "embeddings",
+            "labels",]
+        
+        return_value_names_2 = [
+            "embeddings",
+            "labels",]
+        
+        if return_predicted_labels:
+            return_value_1.append(np.argmax(embeddings_1,axis=1))
+            return_value_names_1.append("predicted_labels")
+            
+            return_value_2.append(np.argmax(embeddings_2,axis=1))
+            return_value_names_2.append("predicted_labels")
+        
+        
+        for f in features_dict_1:
+            if len(features_dict_1[f]) == 0:
+                continue
+            return_value_1.append(np.hstack(features_dict_1[f]))
+            return_value_names_1.append(f)
+            
+        for f in features_dict_2:
+            if len(features_dict_2[f]) == 0:
+                continue
+            return_value_2.append(np.hstack(features_dict_2[f]))
+            return_value_names_2.append(f)
                 
-        return_dict = {k:v for k,v in zip(return_value_names,return_value)}
+        return_dict_1 = {k:v for k,v in zip(return_value_names_1,return_value_1)}
+        return_dict_2 = {k:v for k,v in zip(return_value_names_2,return_value_2)}
         
         if return_df:
-            df = pd.DataFrame(embeddings)
-            for k,v in return_dict.items():
+            df_1 = pd.DataFrame(embeddings_1)
+            for k,v in return_dict_1.items():
                 if k == "embeddings":
                     continue
-                df[k] = v
-            return df
+                df_1[k] = v
+                
+            df_2 = pd.DataFrame(embeddings_2)
+            for k,v in return_dict_2.items():
+                if k == "embeddings":
+                    continue
+                df_2[k] = v
+            return df_1,df_2
         if return_dict_for_embed:
-            return return_dict
+            return return_dict_1,return_dict_2
         else:
-            return return_value
+            return return_value_1,return_value_2
         
     else:
         raise Exception("")
