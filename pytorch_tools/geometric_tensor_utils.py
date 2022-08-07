@@ -56,4 +56,13 @@ def normalize_in_pool_from_pool_tensor(tensor):
     normalize_over_pool = torch.ones(numb_in_pool.shape)/numb_in_pool
     return normalize_over_pool[tensor.to(dtype=torch.int64)]
 
+def ptr_from_pool_tensor(tensor):
+    """
+    Purpose: to compute a new ptr tensor from
+    a pool tensor
+    """
+    ptr = torch.cumsum(gtu.n_in_pool_from_pool_tensor(tensor),0)
+    new_ptr =  torch.hstack([torch.zeros(1),ptr]).to(dtype=torch.int64)
+    return new_ptr
+
 import geometric_tensor_utils as gtu

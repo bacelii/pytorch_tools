@@ -63,12 +63,17 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         # linear layer training
         dropout_p = 0.5,
 
+        super_node_pool = False,
+        
         return_pool_after_pool1 = False,
         return_pool_after_pool1_method = "mean",
+        
         
         verbose = True,
         **kwargs
         ):
+        
+        self.super_node_pool = super_node_pool
         
         self.return_pool_after_pool1 = return_pool_after_pool1
         self.return_pool_after_pool1_method = return_pool_after_pool1_method
@@ -199,9 +204,14 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         
         x, edge_index = data.x, data.edge_index
         batch = getattr(data,"batch",None)
+        ptr = getattr(data,"ptr",None)
+        
         
         if batch is None:
             batch = torch.zeros(len(x),dtype=torch.int64)
+        
+        if ptr is None:
+            ptr = torch.tensor([0,len(x)],dtype=torch.int64)
         
         all_layer_x = []
         for pool_idx in range(self.n_pool):
@@ -311,7 +321,13 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 if tenu.isnan_any(pool_vec):
                     raise Exception(f"Nan output pool_vec, pool_idx {pool_idx} gnc layer {i}")
                     
-            x = self.global_pool_func(x, pool_vec,weights=weight_values,debug_nan=debug_nan)
+            
+            if pool_idx == self.n_pool - 1 and self.super_node_pool:
+                print(f"Using the super node pooling")
+                x = x[ptr[:-1]]
+            else:
+                x = self.global_pool_func(x, pool_vec,weights=weight_values,debug_nan=debug_nan)
+                
             
             if debug_nan:
                 if tenu.isnan_any(x):
@@ -344,6 +360,10 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             
             x_pool = getattr(data,f"x_{next_pool}",torch.Tensor([]))
             batch = global_mean_pool(batch,pool_vec)
+            ptr = gtu.ptr_from_pool_tensor(
+                tensor = batch
+            )
+            # need to fix the pointer
             
             if self.return_pool_after_pool1:
                 #print(f"Returning ealry")
@@ -358,6 +378,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             
             #getting new edge index
             edge_index = getattr(data,f"edge_index_{next_pool}",None)
+            
+            
             
             
             
@@ -601,7 +623,7 @@ def forward_pass(
         if mode == "train":
             
             # --- determining the 2 loss functions ----
-            curr_loss_1,curr_loss_2 = hierarchical_loss(
+            curr_loss_1,curr_loss_2 = hru.hierarchical_loss(
                 loss_function,
                 x1,x2,
                 y1,y2,
@@ -644,7 +666,7 @@ def forward_pass(
                     
         elif mode == "test":
             with torch.no_grad():
-                curr_loss_1,curr_loss_2 = hierarchical_loss(
+                curr_loss_1,curr_loss_2 = hru.hierarchical_loss(
                     loss_function,
                     x1,x2,
                     y1,y2,
@@ -806,7 +828,7 @@ def forward_pass(
                 
         
         
-import hierarchical_models as hm
+import hierarchical_utils as hru
             
         
             
