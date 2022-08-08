@@ -3,6 +3,7 @@ import torch
 from torch.nn import Linear
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
+#from geometric_models_overload import GCNConv
 from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
 import numpy as np
 import torch as th
@@ -56,7 +57,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         residual_connections = False,
         
         # for applyin any edge weights
-        edge_weight = False,
+        edge_weight = None,
         edge_weight_name = "edge_weight",
         add_self_loops = None,
         
@@ -97,13 +98,15 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         # --- for the edge weights ---
         self.edge_weight = edge_weight
         if add_self_loops is None:
-            if self.edge_weight is not None:
+            if self.edge_weight == True:
                 self.add_self_loops = False
             else:
                 self.add_self_loops = True
         else:
             self.add_self_loops = add_self_loops
             
+        print(f"self.add_self_loops = {self.add_self_loops}")
+        
         self.edge_weight_name = edge_weight_name
         
         self.dropout_p = dropout_p
@@ -117,6 +120,10 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         for pool_idx in range(self.n_pool):
             
             suffix = f"_pool{pool_idx}"
+            
+            normalize = not ((pool_idx == self.n_pool - 1) and self.super_node_pool)
+            
+            print(f"For pool_idx {pool_idx}, normalize = {normalize}")
             
             # sets up the number of hidden channels
             n_hidden_channels_pool = eval(f"n_hidden_channels{suffix}")
@@ -140,12 +147,19 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 
             # Creating the convolutional and batch layers
             for i in range(len(n_hidden_channels_pool)-1):
+                
                 n_hidden_channels_for_aggregator.append(n_hidden_channels_pool[i+1])
                 
                 n_input = n_hidden_channels_pool[i]
                 n_output = n_hidden_channels_pool[i+1]
                 
-                setattr(self,f"conv{i}{suffix}",GCNConv(n_input, n_output,add_self_loops=self.add_self_loops))
+                setattr(self,f"conv{i}{suffix}",GCNConv(
+                    n_input, 
+                    n_output,
+                    add_self_loops=self.add_self_loops,
+                    normalize = normalize,
+                ))
+                       
                 
                 if use_bn: 
                     setattr(self,
@@ -185,6 +199,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         data,
         debug_encode = False,
         debug_nan = False,
+        debug_conv = False,
         ):
         
         """
@@ -207,6 +222,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         ptr = getattr(data,"ptr",None)
         
         
+        
         if batch is None:
             batch = torch.zeros(len(x),dtype=torch.int64)
         
@@ -215,6 +231,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         
         all_layer_x = []
         for pool_idx in range(self.n_pool):
+            
             if debug_encode:
                 print(f"Working on Pool {pool_idx}")
                 
@@ -236,9 +253,18 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     
                 if self.residual_connections:
                     x_old = x.clone()
-                    
+                
+                if debug_conv:
+                    conv_layer = getattr(self,f"conv{i}{suffix}")
+                    bias,params = list(conv_layer.parameters())
+                    print(f"params = {params}")
+                    print(f"edge_index = {edge_index.T[:12]}")
+                    print(f"x pool_idx {pool_idx} BEFORE conv ({x.sum()}): {x[:10]}")
                 x = getattr(self,f"conv{i}{suffix}")(x, edge_index,
                                                      edge_weight=edge_weight)
+                    
+                if debug_conv:
+                    print(f"x pool_idx {pool_idx} after conv ({x.sum()}): {x[:10]}")
                 
                 if debug_nan:
                     if tenu.isnan_any(x):
@@ -252,6 +278,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     if debug_nan:
                         if tenu.isnan_any(x):
                             raise Exception(f"Nan output batch norm, pool_idx {pool_idx} gnc layer {i}")
+                            
+                #print(f"inside x pool_idx {pool_idx} after BN: {x}")
                 if (i < n_conv-1): # and (pool_idx == self.n_pool - 1):
                     if debug_encode:
                         print(f"Using act_fun {self.act_func} {i}")
@@ -260,6 +288,9 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     if debug_nan:
                         if tenu.isnan_any(x):
                             raise Exception(f"Nan output acti norm, pool_idx {pool_idx} gnc layer {i}")
+                #print(f"inside x pool_idx {pool_idx} after act: {x}")
+                
+                #print(f"End of convolution loop x pool_idx {pool_idx}: {x}")
                     
                 if self.aggregate_layer_outputs:
                     all_layer_x.append(x.clone())
@@ -305,6 +336,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             if debug_encode:
                 print(f"Right before pool func: {self.global_pool_func.__name__}")
                 
+            #print(f"x outside loop pool_idx = {pool_idx}: {x}")
 #             print(f"x.shape = {x.shape}")
 #             print(f"pool_vec.shape = {pool_vec.shape}")
 #             print(f"weight_values = {weight_values.shape}")
@@ -323,7 +355,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     
             
             if pool_idx == self.n_pool - 1 and self.super_node_pool:
-                print(f"Using the super node pooling")
+                #print(f"Using the super node pooling")
                 x = x[ptr[:-1]]
             else:
                 x = self.global_pool_func(x, pool_vec,weights=weight_values,debug_nan=debug_nan)
@@ -354,6 +386,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     raise Exception(f"Nan output softmax, pool_idx {pool_idx} gnc layer {i}")
             
             if pool_idx == self.n_pool - 1:
+                #raise Exception("")
                 return x_0,x
             
             x_0 = x.clone()
@@ -375,6 +408,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             #print(f"x_pool = {x_pool}")
             if eval(f"self.num_node_features_{next_pool}") > 0: 
                 x = torch.hstack([x,x_pool])
+                
+            
             
             #getting new edge index
             edge_index = getattr(data,f"edge_index_{next_pool}",None)
