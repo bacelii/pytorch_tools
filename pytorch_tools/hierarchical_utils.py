@@ -2,8 +2,8 @@
 import torch
 from torch.nn import Linear
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
-#from geometric_models_overload import GCNConv
+#from torch_geometric.nn import GCNConv
+from geometric_models_overload import GCNConv
 from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
 import numpy as np
 import torch as th
@@ -43,6 +43,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         #hyper-parameters for the training
         activation_function = "relu",
         use_bn = True,
+        use_bn_pool0 = None,
+        use_bn_pool1 = None,
         track_running_stats=True,
         
         #pooling parameters
@@ -69,6 +71,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         return_pool_after_pool1 = False,
         return_pool_after_pool1_method = "mean",
         
+        use_lin_pool1 = False,
         
         verbose = True,
         **kwargs
@@ -82,6 +85,17 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         super(GCNHierarchicalClassifier, self).__init__()
         self.n_pool = 2
         self.use_bn = use_bn
+        
+        if use_bn_pool0 is None:
+            self.use_bn_pool0 = use_bn
+        else:
+            self.use_bn_pool0 = use_bn_pool0
+        
+        if use_bn_pool1 is None:
+            self.use_bn_pool1 = use_bn
+        else:
+            self.use_bn_pool1 = use_bn_pool1
+        
         self.act_func = getattr(F,activation_function)
         
         # -- for the pooling --
@@ -113,6 +127,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         
         self.num_node_features_pool1 = num_node_features_pool1
         
+        
+        self.use_lin_pool1 = use_lin_pool1
         # --- architecture ----
         n_input_layer = dataset_num_node_features
         
@@ -160,8 +176,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     normalize = normalize,
                 ))
                        
-                
-                if use_bn: 
+                curr_bn = eval(f"self.use_bn{suffix}")
+                if curr_bn: 
                     setattr(self,
                             f"bn{i}{suffix}",
                             torch.nn.BatchNorm1d(
@@ -188,7 +204,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 lin_n_layers = n_hidden_channels_pool[-1]
             
             # Creating the linear classification layers
-            setattr(self,f"lin{suffix}",Linear(lin_n_layers, dataset_num_classes))
+            if pool_idx < self.n_pool - 1 or self.use_lin_pool1:
+                setattr(self,f"lin{suffix}",Linear(lin_n_layers, dataset_num_classes))
             
             n_input_layer = (
                 dataset_num_classes + n_extra_features
@@ -257,6 +274,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 if debug_conv:
                     conv_layer = getattr(self,f"conv{i}{suffix}")
                     bias,params = list(conv_layer.parameters())
+                    print(f"bias = {bias}")
                     print(f"params = {params}")
                     print(f"edge_index = {edge_index.T[:12]}")
                     print(f"x pool_idx {pool_idx} BEFORE conv ({x.sum()}): {x[:10]}")
@@ -270,7 +288,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     if tenu.isnan_any(x):
                         raise Exception(f"Nan output gcn, pool_idx {pool_idx} gnc layer {i}")
                 
-                if self.use_bn:
+                curr_bn = eval(f"self.use_bn{suffix}")
+                if curr_bn:
                     if debug_encode:
                         print(f"Using bn iter {i}")
                     x = getattr(self,f"bn{i}{suffix}")(x)
@@ -365,19 +384,19 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 if tenu.isnan_any(x):
                     raise Exception(f"Nan output weighted pool, pool_idx {pool_idx} gnc layer {i}")
             
-            
-            # Feed into classifier
-            x = F.dropout(x, p=self.dropout_p, training=self.training)
-            
-            if debug_nan:
-                if tenu.isnan_any(x):
-                    raise Exception(f"Nan output dropout, pool_idx {pool_idx} gnc layer {i}")
-            
-            x = getattr(self,f"lin{suffix}")(x)
-            
-            if debug_nan:
-                if tenu.isnan_any(x):
-                    raise Exception(f"Nan output linear layer, pool_idx {pool_idx} gnc layer {i}")
+            if pool_idx < self.n_pool - 1 or self.use_lin_pool1:
+                # Feed into classifier
+                x = F.dropout(x, p=self.dropout_p, training=self.training)
+
+                if debug_nan:
+                    if tenu.isnan_any(x):
+                        raise Exception(f"Nan output dropout, pool_idx {pool_idx} gnc layer {i}")
+
+                x = getattr(self,f"lin{suffix}")(x)
+
+                if debug_nan:
+                    if tenu.isnan_any(x):
+                        raise Exception(f"Nan output linear layer, pool_idx {pool_idx} gnc layer {i}")
                     
             x = F.softmax(x,dim=1)
             

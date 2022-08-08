@@ -46,8 +46,8 @@ class GCNConv(gc):
                 edge_attr = None,
                 num_nodes = len(x))
             
-            #print(f"Edge change = {len(edge_index) - old_n_edges}")
-            #print(f"edge_index[-10:] = {edge_index.T[-10:] }")
+#             print(f"Edge change = {len(edge_index) - old_n_edges}")
+#             print(f"edge_index[-10:] = {edge_index.T[-10:] }")
         
         return super().forward(x,edge_index,edge_weight,**kwargs)
     

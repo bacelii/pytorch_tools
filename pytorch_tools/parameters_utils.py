@@ -1,3 +1,6 @@
+import torch
+from collections import OrderedDict
+
 def layer_bias(layer):
     return layer.bias
 
@@ -15,6 +18,38 @@ def load_state_dict(model,state_dict):
     
 def copy_model_parameters_to_model(model_source,model_target):
     model_target.load_state_dict(model_source.state_dict())
+    
+def set_geometric_parameters(
+    model,
+    layer_name=None,
+    verbose = False,
+    strict = False,
+    **kwargs
+    ):
+    
+    curr_dict = {}
+    
+    if layer_name is None:
+        layer_name = ""
+    else:
+        layer_name = f"{layer_name}."
+    
+    for name,value in kwargs.items():
+        name = name.replace("_",".")
+        long_name = f"{layer_name}{name}"
+        if "str" in str(type(value)):
+            if value == "eye":
+                value = torch.eye(len(eval(f"model.{long_name}")))
+            else:
+                value = getattr(torch,value)(eval(f"model.{long_name}.shape"))
+        curr_dict[long_name] = value
+    
+    if verbose:
+        print(f"curr_dict = {curr_dict}")
+                                         
+    new_state_dict = OrderedDict(curr_dict)
+    model.load_state_dict(new_state_dict,strict = strict,)
+    
     
 def parameters(
     model,
