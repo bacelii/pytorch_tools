@@ -65,13 +65,17 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         
         # linear layer training
         dropout_p = 0.5,
+        dropout_p_pool0 = None,
+        dropout_p_pool1 = None,
+        use_lin_pool1 = False,
 
         super_node_pool = False,
         
         return_pool_after_pool1 = False,
         return_pool_after_pool1_method = "mean",
         
-        use_lin_pool1 = False,
+        
+        
         
         verbose = True,
         **kwargs
@@ -123,7 +127,13 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         
         self.edge_weight_name = edge_weight_name
         
-        self.dropout_p = dropout_p
+        if dropout_p_pool0 is None:
+            dropout_p_pool0 = dropout_p
+        self.dropout_p_pool0 = dropout_p_pool0
+        
+        if dropout_p_pool1 is None:
+            dropout_p_pool1 = dropout_p
+        self.dropout_p_pool1 = dropout_p_pool1
         
         self.num_node_features_pool1 = num_node_features_pool1
         
@@ -386,7 +396,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             
             if pool_idx < self.n_pool - 1 or self.use_lin_pool1:
                 # Feed into classifier
-                x = F.dropout(x, p=self.dropout_p, training=self.training)
+                x = F.dropout(x, p=getattr(self,f"dropout_p{suffix}"), training=self.training)
 
                 if debug_nan:
                     if tenu.isnan_any(x):
