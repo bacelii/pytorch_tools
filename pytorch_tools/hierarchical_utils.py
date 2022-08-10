@@ -4,11 +4,13 @@ from torch.nn import Linear
 import torch.nn.functional as F
 #from torch_geometric.nn import GCNConv
 from geometric_models_overload import GCNConv
-from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
+from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool,global_max_pool
 import numpy as np
 import torch as th
 import torch.nn as nn
 import geometric_tensor_utils as gtu
+from geometric_models import ClassifierBase
+
 
 #custom modules
 import numpy_utils as nu
@@ -74,8 +76,10 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         return_pool_after_pool1 = False,
         return_pool_after_pool1_method = "mean",
         
+        linear_clf_n_layers_pool0 = 1,
+        linear_clf_n_layers_pool1 = 1,
         
-        
+        append_max_pool=False,
         
         verbose = True,
         **kwargs
@@ -86,7 +90,7 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         self.return_pool_after_pool1 = return_pool_after_pool1
         self.return_pool_after_pool1_method = return_pool_after_pool1_method
         
-        super(GCNHierarchicalClassifier, self).__init__()
+        super().__init__()
         self.n_pool = 2
         self.use_bn = use_bn
         
@@ -143,6 +147,10 @@ class GCNHierarchicalClassifier(torch.nn.Module):
         n_input_layer = dataset_num_node_features
         
         n_hidden_channels_for_aggregator = []
+        
+        
+        # for the pooling operations
+        self.append_max_pool = append_max_pool
         for pool_idx in range(self.n_pool):
             
             suffix = f"_pool{pool_idx}"
@@ -212,14 +220,27 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 lin_n_layers = sum(n_hidden_channels_for_aggregator)
             else:
                 lin_n_layers = n_hidden_channels_pool[-1]
+                
+            if append_max_pool:
+                lin_n_layers = lin_n_layers*2
             
             # Creating the linear classification layers
             if pool_idx < self.n_pool - 1 or self.use_lin_pool1:
-                setattr(self,f"lin{suffix}",Linear(lin_n_layers, dataset_num_classes))
+                setattr(self,f"lin{suffix}",ClassifierBase(
+                        n_classes = dataset_num_classes,
+                        n_inputs = lin_n_layers, 
+                        n_hidden_layers = eval(f"linear_clf_n_layers{suffix}"),
+                        use_bn = True,
+                        softmax = False,
+                        dropout = getattr(self,f"dropout_p{suffix}"),
+                    )
+                    )
             
             n_input_layer = (
                 dataset_num_classes + n_extra_features
                 )
+            
+            
     
     def encode(
         self,
@@ -337,9 +358,8 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                 
             if debug_encode:
                 print(f"Right before pooling weight_values = {weight_values}")
-                
-            if debug_encode:
                 print(f'weight_values = {weight_values}')
+                
             
             #doing the aggregation of x's if aggregating all outputs
             if self.n_pool == pool_idx + 1:
@@ -373,21 +393,24 @@ class GCNHierarchicalClassifier(torch.nn.Module):
             if debug_nan:
                 if tenu.isnan_any(x):
                     raise Exception(f"Nan output x, pool_idx {pool_idx} gnc layer {i}")
-            
-            if debug_nan:
                 if tenu.isnan_any(weight_values):
                     raise Exception(f"Nan output weight_values, pool_idx {pool_idx} gnc layer {i}")
-                    
-            if debug_nan:
                 if tenu.isnan_any(pool_vec):
                     raise Exception(f"Nan output pool_vec, pool_idx {pool_idx} gnc layer {i}")
+
+                
                     
             
             if pool_idx == self.n_pool - 1 and self.super_node_pool:
                 #print(f"Using the super node pooling")
                 x = x[ptr[:-1]]
             else:
+                if self.append_max_pool:
+                    x_max = global_max_pool(x,pool_vec)
                 x = self.global_pool_func(x, pool_vec,weights=weight_values,debug_nan=debug_nan)
+                if self.append_max_pool:
+                    x = torch.hstack([x,x_max])
+                    
                 
             
             if debug_nan:
@@ -395,13 +418,6 @@ class GCNHierarchicalClassifier(torch.nn.Module):
                     raise Exception(f"Nan output weighted pool, pool_idx {pool_idx} gnc layer {i}")
             
             if pool_idx < self.n_pool - 1 or self.use_lin_pool1:
-                # Feed into classifier
-                x = F.dropout(x, p=getattr(self,f"dropout_p{suffix}"), training=self.training)
-
-                if debug_nan:
-                    if tenu.isnan_any(x):
-                        raise Exception(f"Nan output dropout, pool_idx {pool_idx} gnc layer {i}")
-
                 x = getattr(self,f"lin{suffix}")(x)
 
                 if debug_nan:

@@ -2,7 +2,7 @@ import torch
 from torch.nn import Linear
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
-from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
+from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool,global_max_pool
 import numpy as np
 import torch as th
 import torch.nn as nn
@@ -63,7 +63,7 @@ class ClassifierBase(nn.Module):
         self,
         n_classes,
         n_inputs,
-        n_hidden = 200,
+        n_hidden = None,
         activation_function = "tanh",
         n_hidden_layers = 4,
         hidden_units_divisor = 2,
@@ -74,6 +74,10 @@ class ClassifierBase(nn.Module):
         super(ClassifierBase, self).__init__()
         
         # Our final linear layer will define our output
+        if n_hidden_layers <= 1:
+            n_hidden = n_classes
+        elif n_hidden is None:
+            n_hidden = n_inputs // hidden_units_divisor
         self.lin0 = Linear(n_inputs,n_hidden)
         previous_layers_units = n_hidden
         
@@ -101,7 +105,8 @@ class ClassifierBase(nn.Module):
             
     def forward(self,x):
         for i in range(self.n_hidden_layers):
-            x = F.dropout(x, p=self.dropout, training=self.training)
+            if self.dropout is not None:
+                x = F.dropout(x, p=self.dropout, training=self.training)
             x = getattr(self,f"lin{i}")(x)
             if i < self.n_hidden_layers - 1:
                 if self.use_bn:
@@ -273,6 +278,7 @@ class GCNHierarchical(torch.nn.Module):
         #n_layers_pool0
         #num_node_features_pool1
         #num_node_features_pool2
+        append_max_pool=False,
         **kwargs
         ):
         
@@ -359,7 +365,6 @@ class GCNHierarchical(torch.nn.Module):
             
 
             if self.n_pool == pool_idx:
-                
                 n_extra_features = 0
             else:
                 n_extra_features = kwargs.get(f"num_node_features_pool{pool_idx+1}")
@@ -374,6 +379,11 @@ class GCNHierarchical(torch.nn.Module):
         else:
             lin_n_layers = n_input_layer
             
+        self.append_max_pool = append_max_pool
+        if self.append_max_pool:
+            lin_n_layers = 2*lin_n_layers
+            
+        
         self.lin = Linear(lin_n_layers, dataset_num_classes)
         
                 
@@ -462,6 +472,9 @@ class GCNHierarchical(torch.nn.Module):
                         raise Exception("")
                         
                 return_x = self.global_pool_func(x,batch,weights=weight_values)
+                
+                if self.append_max_pool:
+                    return_x = torch.hstack([return_x,global_max_pool(x,batch)])
                 #print(f"return_x.shape = {return_x.shape}")
                 return return_x
             
@@ -499,8 +512,12 @@ class GCNHierarchical(torch.nn.Module):
             
             if pool_return == pool_idx + 1:
                 if need_batch:
+                    
                     if batch_pool_before_return:
-                        return self.global_pool_func(x,batch,weights=weight_values)
+                        return_x = self.global_pool_func(x,batch,weights=weight_values)
+                        if self.append_max_pool:
+                            return_x = torch.hstack([return_x,global_max_pool(x,batch)])
+                        return return_x
                     else:
                         return x,batch
                 else:

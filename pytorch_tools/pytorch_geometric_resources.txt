@@ -1,5 +1,8 @@
+--- Reviews ----
+
 Explaining different types of pooling with Graph Transformer: 
 https://seunghan96.github.io/gnn/PyG_review2/
+https://seunghan96.github.io/gnn/PyG_review1/
 
 Contrastive Learning Repository for Pytorch Geometric: 
 https://github.com/PyGCL/PyGCL
