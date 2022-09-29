@@ -685,6 +685,9 @@ def pytorch_data_hierarchical_from_single_data(
     for k in attributes_to_include:
         val = data_dict[k]
         if nu.is_array_like(val):
+            val = np.array(val)
+            if np.array(val).dtype == np.dtype('O'):
+                val = val.astype('int')
             data_prep[k] = torch.Tensor(val)
         else:
             data_prep[k] = val
