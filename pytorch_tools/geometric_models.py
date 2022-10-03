@@ -391,7 +391,8 @@ class GCNHierarchical(torch.nn.Module):
         self,
         data,
         pool_return = None,
-        batch_pool_before_return = True,):
+        batch_pool_before_return = True,
+        **kwargs):
         """
         Purpose: To encode the data to a certain pool range
         """
