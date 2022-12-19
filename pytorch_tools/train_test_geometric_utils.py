@@ -37,6 +37,7 @@ def forward_pass(
     return_dict_for_embed = False,
     return_df = False,
     debug_nan = False,
+    classifier_layer = True,
     verbose = False,):
     
     debug = False
@@ -106,9 +107,9 @@ def forward_pass(
                     embeddings = data.x
                     )
             else:
-                out = model(data)
+                out = model(data,classifier_layer=classifier_layer)
         else:
-            out = model(data)
+            out =  model(data,classifier_layer=classifier_layer)
         y_true = data.y.squeeze_()
         #print(f"out.shape = {out.shape}, data.y.shape = {data.y.shape}")
         
