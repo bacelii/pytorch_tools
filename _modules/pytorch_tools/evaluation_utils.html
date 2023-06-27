@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytorch_tools.evaluation_utils &mdash; pytorch_tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pytorch_tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pytorch_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pytorch_tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pytorch_tools.evaluation_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytorch_tools.evaluation_utils</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<div class="viewcode-block" id="metric_pre"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.metric_pre">[docs]</a><span class="k">def</span> <span class="nf">metric_pre</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+    
+    <span class="k">assert</span> <span class="n">y_true</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span>
+    
+    <span class="k">if</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+    <span class="c1"># if want to map certain classes to the positive or negative class</span>
+    <span class="k">if</span> <span class="n">tensor_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">tensor_map</span><span class="p">[</span><span class="n">y_pred</span><span class="p">]</span>
+        <span class="n">y_true</span> <span class="o">=</span> <span class="n">tensor_map</span><span class="p">[</span><span class="n">y_true</span><span class="p">]</span>
+        
+    <span class="k">return</span> <span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span></div>
+
+<div class="viewcode-block" id="true_false_pos_neg"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.true_false_pos_neg">[docs]</a><span class="k">def</span> <span class="nf">true_false_pos_neg</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To calculate the tp,tn,fp,fn for </span>
+<span class="sd">    binary classification</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">metric_pre</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">)</span>
+    
+    <span class="n">tp</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_true</span> <span class="o">*</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">tn</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_true</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_true</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_true</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">tp</span><span class="p">,</span><span class="n">tn</span><span class="p">,</span><span class="n">fp</span><span class="p">,</span><span class="n">fn</span></div>
+
+<div class="viewcode-block" id="precision"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.precision">[docs]</a><span class="k">def</span> <span class="nf">precision</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+    
+    <span class="n">tp</span><span class="p">,</span><span class="n">tn</span><span class="p">,</span><span class="n">fp</span><span class="p">,</span><span class="n">fn</span> <span class="o">=</span> <span class="n">evu</span><span class="o">.</span><span class="n">true_false_pos_neg</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">)</span>
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+    <span class="n">precision</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="n">is_training</span>
+    <span class="k">return</span> <span class="n">precision</span></div>
+
+<div class="viewcode-block" id="recall"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.recall">[docs]</a><span class="k">def</span> <span class="nf">recall</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+    
+    <span class="n">tp</span><span class="p">,</span><span class="n">tn</span><span class="p">,</span><span class="n">fp</span><span class="p">,</span><span class="n">fn</span> <span class="o">=</span> <span class="n">evu</span><span class="o">.</span><span class="n">true_false_pos_neg</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+    <span class="n">recall</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="n">is_training</span>
+    <span class="k">return</span> <span class="n">recall</span></div>
+
+<div class="viewcode-block" id="f1"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.f1">[docs]</a><span class="k">def</span> <span class="nf">f1</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">is_training</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Calculate F1 score. Can work with gpu tensors</span>
+<span class="sd">    </span>
+<span class="sd">    The original implmentation is written by Michal Haltuf on Kaggle.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        `ndim` == 1. 0 &lt;= val &lt;= 1</span>
+<span class="sd">    </span>
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    - https://www.kaggle.com/rejpalcz/best-loss-function-for-f1-score-metric</span>
+<span class="sd">    - https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html#sklearn.metrics.f1_score</span>
+<span class="sd">    - https://discuss.pytorch.org/t/calculating-precision-recall-and-f1-score-in-case-of-multi-label-classification/28265/6</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tp</span><span class="p">,</span><span class="n">tn</span><span class="p">,</span><span class="n">fp</span><span class="p">,</span><span class="n">fn</span> <span class="o">=</span> <span class="n">evu</span><span class="o">.</span><span class="n">true_false_pos_neg</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">)</span>
+    
+    <span class="n">precision</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+    <span class="n">recall</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+    
+    <span class="n">f1</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span> <span class="p">(</span><span class="n">precision</span><span class="o">*</span><span class="n">recall</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">precision</span> <span class="o">+</span> <span class="n">recall</span> <span class="o">+</span> <span class="n">epsilon</span><span class="p">)</span>
+    <span class="n">f1</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="n">is_training</span>
+    <span class="k">return</span> <span class="n">f1</span></div>
+
+<div class="viewcode-block" id="accuracy"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.accuracy">[docs]</a><span class="k">def</span> <span class="nf">accuracy</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-7</span><span class="p">,</span>
+    <span class="n">is_training</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+    
+<span class="c1">#     tp,tn,fp,fn = evu.true_false_pos_neg(y_true,y_pred,tensor_map=tensor_map)</span>
+<span class="c1">#     accuracy = (tp + tn) / (tp + tn + fp + fn + epsilon)</span>
+    <span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">metric_pre</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">)</span>
+    
+    <span class="n">accuracy</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_true</span> <span class="o">==</span> <span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
+    <span class="n">accuracy</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="n">is_training</span>
+    <span class="k">return</span> <span class="n">accuracy</span></div>
+
+<div class="viewcode-block" id="metric_dict"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.evaluation_utils.metric_dict">[docs]</a><span class="k">def</span> <span class="nf">metric_dict</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tensor_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+    
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">y_true_unique</span><span class="p">,</span><span class="n">y_true_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">return_counts</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   y_true_unique= </span><span class="si">{</span><span class="n">y_true_unique</span><span class="si">}</span><span class="s2">,y_true_counts = </span><span class="si">{</span><span class="n">y_true_counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="n">y_pred_unique</span><span class="p">,</span><span class="n">y_pred_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span><span class="n">return_counts</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   y_pred_unique= </span><span class="si">{</span><span class="n">y_pred_unique</span><span class="si">}</span><span class="s2">,y_pred_counts = </span><span class="si">{</span><span class="n">y_pred_counts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">accuracy_binary</span><span class="o">=</span><span class="n">evu</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">),</span>
+        <span class="n">accuracy</span><span class="o">=</span><span class="n">evu</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">),</span>
+        <span class="n">precision</span><span class="o">=</span><span class="n">evu</span><span class="o">.</span><span class="n">precision</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">),</span>
+        <span class="n">recall</span><span class="o">=</span><span class="n">evu</span><span class="o">.</span><span class="n">recall</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">),</span>
+        <span class="n">f1</span><span class="o">=</span><span class="n">evu</span><span class="o">.</span><span class="n">recall</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span><span class="n">y_pred</span><span class="p">,</span><span class="n">tensor_map</span><span class="o">=</span><span class="n">tensor_map</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">evaluation_metrics</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">evaluation_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">}</span>
+    <span class="k">return</span>  <span class="n">evaluation_metrics</span></div>
+
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">evaluation_utils</span> <span class="k">as</span> <span class="n">evu</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytorch_tools &mdash; pytorch_tools  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pytorch_tools package" href="pytorch_tools.html" />
+    <link rel="prev" title="Welcome to pytorch_tools’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pytorch_tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pytorch_tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html">pytorch_tools package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pytorch_tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">pytorch_tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pytorch-tools">
+<h1>pytorch_tools<a class="headerlink" href="#pytorch-tools" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pytorch_tools.html">pytorch_tools package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#pytorch-tools-data-augmentation-utils-module">pytorch_tools.data_augmentation_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.dgl_utils">pytorch_tools.dgl_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.dgl_utils.from_networkx"><code class="docutils literal notranslate"><span class="pre">from_networkx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.dgl_utils.g_from_data"><code class="docutils literal notranslate"><span class="pre">g_from_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.evaluation_utils">pytorch_tools.evaluation_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.accuracy"><code class="docutils literal notranslate"><span class="pre">accuracy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.f1"><code class="docutils literal notranslate"><span class="pre">f1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.metric_dict"><code class="docutils literal notranslate"><span class="pre">metric_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.metric_pre"><code class="docutils literal notranslate"><span class="pre">metric_pre()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.precision"><code class="docutils literal notranslate"><span class="pre">precision()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.recall"><code class="docutils literal notranslate"><span class="pre">recall()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.evaluation_utils.true_false_pos_neg"><code class="docutils literal notranslate"><span class="pre">true_false_pos_neg()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#pytorch-tools-geometric-dataset-utils-module">pytorch_tools.geometric_dataset_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.geometric_models">pytorch_tools.geometric_models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedDiffPool"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedDiffPool.__init__"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedDiffPool.cluster"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool.cluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedDiffPool.encode"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedDiffPool.forward"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedDiffPool.training"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedGraphSAGE"><code class="docutils literal notranslate"><span class="pre">BatchedGraphSAGE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedGraphSAGE.__init__"><code class="docutils literal notranslate"><span class="pre">BatchedGraphSAGE.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedGraphSAGE.forward"><code class="docutils literal notranslate"><span class="pre">BatchedGraphSAGE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.BatchedGraphSAGE.training"><code class="docutils literal notranslate"><span class="pre">BatchedGraphSAGE.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ChildSumTreeLSTMCell"><code class="docutils literal notranslate"><span class="pre">ChildSumTreeLSTMCell</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ChildSumTreeLSTMCell.__init__"><code class="docutils literal notranslate"><span class="pre">ChildSumTreeLSTMCell.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ChildSumTreeLSTMCell.apply_node_func"><code class="docutils literal notranslate"><span class="pre">ChildSumTreeLSTMCell.apply_node_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ChildSumTreeLSTMCell.message_func"><code class="docutils literal notranslate"><span class="pre">ChildSumTreeLSTMCell.message_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ChildSumTreeLSTMCell.reduce_func"><code class="docutils literal notranslate"><span class="pre">ChildSumTreeLSTMCell.reduce_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ChildSumTreeLSTMCell.training"><code class="docutils literal notranslate"><span class="pre">ChildSumTreeLSTMCell.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.Classifier"><code class="docutils literal notranslate"><span class="pre">Classifier</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.Classifier.__init__"><code class="docutils literal notranslate"><span class="pre">Classifier.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.Classifier.forward"><code class="docutils literal notranslate"><span class="pre">Classifier.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.Classifier.training"><code class="docutils literal notranslate"><span class="pre">Classifier.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierBase"><code class="docutils literal notranslate"><span class="pre">ClassifierBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierBase.__init__"><code class="docutils literal notranslate"><span class="pre">ClassifierBase.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierBase.forward"><code class="docutils literal notranslate"><span class="pre">ClassifierBase.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierBase.training"><code class="docutils literal notranslate"><span class="pre">ClassifierBase.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierFlat"><code class="docutils literal notranslate"><span class="pre">ClassifierFlat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierFlat.__init__"><code class="docutils literal notranslate"><span class="pre">ClassifierFlat.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierFlat.forward"><code class="docutils literal notranslate"><span class="pre">ClassifierFlat.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.ClassifierFlat.training"><code class="docutils literal notranslate"><span class="pre">ClassifierFlat.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolGCN"><code class="docutils literal notranslate"><span class="pre">DiffPoolGCN</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolGCN.__init__"><code class="docutils literal notranslate"><span class="pre">DiffPoolGCN.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolGCN.dense_adj"><code class="docutils literal notranslate"><span class="pre">DiffPoolGCN.dense_adj</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolGCN.encode"><code class="docutils literal notranslate"><span class="pre">DiffPoolGCN.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolGCN.forward"><code class="docutils literal notranslate"><span class="pre">DiffPoolGCN.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolGCN.training"><code class="docutils literal notranslate"><span class="pre">DiffPoolGCN.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSAGE"><code class="docutils literal notranslate"><span class="pre">DiffPoolSAGE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSAGE.__init__"><code class="docutils literal notranslate"><span class="pre">DiffPoolSAGE.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSAGE.encode"><code class="docutils literal notranslate"><span class="pre">DiffPoolSAGE.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSAGE.forward"><code class="docutils literal notranslate"><span class="pre">DiffPoolSAGE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSAGE.loss"><code class="docutils literal notranslate"><span class="pre">DiffPoolSAGE.loss()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSAGE.training"><code class="docutils literal notranslate"><span class="pre">DiffPoolSAGE.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSimpleGNN"><code class="docutils literal notranslate"><span class="pre">DiffPoolSimpleGNN</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSimpleGNN.__init__"><code class="docutils literal notranslate"><span class="pre">DiffPoolSimpleGNN.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSimpleGNN.forward"><code class="docutils literal notranslate"><span class="pre">DiffPoolSimpleGNN.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.DiffPoolSimpleGNN.training"><code class="docutils literal notranslate"><span class="pre">DiffPoolSimpleGNN.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT"><code class="docutils literal notranslate"><span class="pre">GAT</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT.__init__"><code class="docutils literal notranslate"><span class="pre">GAT.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT.encode"><code class="docutils literal notranslate"><span class="pre">GAT.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT.forward"><code class="docutils literal notranslate"><span class="pre">GAT.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT.reset_parameters"><code class="docutils literal notranslate"><span class="pre">GAT.reset_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT.training"><code class="docutils literal notranslate"><span class="pre">GAT.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT_old"><code class="docutils literal notranslate"><span class="pre">GAT_old</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT_old.__init__"><code class="docutils literal notranslate"><span class="pre">GAT_old.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT_old.encode"><code class="docutils literal notranslate"><span class="pre">GAT_old.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT_old.forward"><code class="docutils literal notranslate"><span class="pre">GAT_old.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT_old.reset_parameters"><code class="docutils literal notranslate"><span class="pre">GAT_old.reset_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GAT_old.training"><code class="docutils literal notranslate"><span class="pre">GAT_old.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCN"><code class="docutils literal notranslate"><span class="pre">GCN</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCN.__init__"><code class="docutils literal notranslate"><span class="pre">GCN.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCN.encode"><code class="docutils literal notranslate"><span class="pre">GCN.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCN.forward"><code class="docutils literal notranslate"><span class="pre">GCN.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCN.training"><code class="docutils literal notranslate"><span class="pre">GCN.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNFlat"><code class="docutils literal notranslate"><span class="pre">GCNFlat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNFlat.__init__"><code class="docutils literal notranslate"><span class="pre">GCNFlat.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNFlat.encode"><code class="docutils literal notranslate"><span class="pre">GCNFlat.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNFlat.forward"><code class="docutils literal notranslate"><span class="pre">GCNFlat.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNFlat.training"><code class="docutils literal notranslate"><span class="pre">GCNFlat.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchical"><code class="docutils literal notranslate"><span class="pre">GCNHierarchical</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchical.__init__"><code class="docutils literal notranslate"><span class="pre">GCNHierarchical.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchical.encode"><code class="docutils literal notranslate"><span class="pre">GCNHierarchical.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchical.forward"><code class="docutils literal notranslate"><span class="pre">GCNHierarchical.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchical.training"><code class="docutils literal notranslate"><span class="pre">GCNHierarchical.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchicalOld"><code class="docutils literal notranslate"><span class="pre">GCNHierarchicalOld</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchicalOld.__init__"><code class="docutils literal notranslate"><span class="pre">GCNHierarchicalOld.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchicalOld.encode"><code class="docutils literal notranslate"><span class="pre">GCNHierarchicalOld.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchicalOld.forward"><code class="docutils literal notranslate"><span class="pre">GCNHierarchicalOld.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GCNHierarchicalOld.training"><code class="docutils literal notranslate"><span class="pre">GCNHierarchicalOld.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GraphSAGE"><code class="docutils literal notranslate"><span class="pre">GraphSAGE</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GraphSAGE.__init__"><code class="docutils literal notranslate"><span class="pre">GraphSAGE.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GraphSAGE.dense_adj"><code class="docutils literal notranslate"><span class="pre">GraphSAGE.dense_adj</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GraphSAGE.encode"><code class="docutils literal notranslate"><span class="pre">GraphSAGE.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GraphSAGE.forward"><code class="docutils literal notranslate"><span class="pre">GraphSAGE.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.GraphSAGE.training"><code class="docutils literal notranslate"><span class="pre">GraphSAGE.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.SAGEConvNet"><code class="docutils literal notranslate"><span class="pre">SAGEConvNet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.SAGEConvNet.__init__"><code class="docutils literal notranslate"><span class="pre">SAGEConvNet.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.SAGEConvNet.encode"><code class="docutils literal notranslate"><span class="pre">SAGEConvNet.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.SAGEConvNet.forward"><code class="docutils literal notranslate"><span class="pre">SAGEConvNet.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.SAGEConvNet.training"><code class="docutils literal notranslate"><span class="pre">SAGEConvNet.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTM"><code class="docutils literal notranslate"><span class="pre">TreeLSTM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTM.__init__"><code class="docutils literal notranslate"><span class="pre">TreeLSTM.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTM.directed"><code class="docutils literal notranslate"><span class="pre">TreeLSTM.directed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTM.encode"><code class="docutils literal notranslate"><span class="pre">TreeLSTM.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTM.forward"><code class="docutils literal notranslate"><span class="pre">TreeLSTM.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTM.training"><code class="docutils literal notranslate"><span class="pre">TreeLSTM.training</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTMCell"><code class="docutils literal notranslate"><span class="pre">TreeLSTMCell</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTMCell.__init__"><code class="docutils literal notranslate"><span class="pre">TreeLSTMCell.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTMCell.apply_node_func"><code class="docutils literal notranslate"><span class="pre">TreeLSTMCell.apply_node_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTMCell.message_func"><code class="docutils literal notranslate"><span class="pre">TreeLSTMCell.message_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTMCell.reduce_func"><code class="docutils literal notranslate"><span class="pre">TreeLSTMCell.reduce_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models.TreeLSTMCell.training"><code class="docutils literal notranslate"><span class="pre">TreeLSTMCell.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.geometric_models_overload">pytorch_tools.geometric_models_overload module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models_overload.GCNConv"><code class="docutils literal notranslate"><span class="pre">GCNConv</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models_overload.GCNConv.__init__"><code class="docutils literal notranslate"><span class="pre">GCNConv.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_models_overload.GCNConv.forward"><code class="docutils literal notranslate"><span class="pre">GCNConv.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.geometric_tensor_utils">pytorch_tools.geometric_tensor_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_tensor_utils.global_mean_pool"><code class="docutils literal notranslate"><span class="pre">global_mean_pool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_tensor_utils.global_mean_weighted_pool"><code class="docutils literal notranslate"><span class="pre">global_mean_weighted_pool()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_tensor_utils.n_in_pool_from_pool_tensor"><code class="docutils literal notranslate"><span class="pre">n_in_pool_from_pool_tensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_tensor_utils.normalize_in_pool_from_pool_tensor"><code class="docutils literal notranslate"><span class="pre">normalize_in_pool_from_pool_tensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_tensor_utils.pool_idx_from_pool_tensor"><code class="docutils literal notranslate"><span class="pre">pool_idx_from_pool_tensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_tensor_utils.ptr_from_pool_tensor"><code class="docutils literal notranslate"><span class="pre">ptr_from_pool_tensor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.geometric_utils">pytorch_tools.geometric_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.geometric_utils.from_networkx"><code class="docutils literal notranslate"><span class="pre">from_networkx()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#pytorch-tools-hierarchical-utils-module">pytorch_tools.hierarchical_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.loss_utils">pytorch_tools.loss_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.model_utils">pytorch_tools.model_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.model_utils.load_checkpoint_to_model"><code class="docutils literal notranslate"><span class="pre">load_checkpoint_to_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.model_utils.save_checkpoint"><code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.parameters_utils">pytorch_tools.parameters_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.add_noise_to_parameters"><code class="docutils literal notranslate"><span class="pre">add_noise_to_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.check_gradient_on_parameters_finite"><code class="docutils literal notranslate"><span class="pre">check_gradient_on_parameters_finite()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.copy_model_parameters_to_model"><code class="docutils literal notranslate"><span class="pre">copy_model_parameters_to_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.isnan_in_parameters"><code class="docutils literal notranslate"><span class="pre">isnan_in_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.layer_bias"><code class="docutils literal notranslate"><span class="pre">layer_bias()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.layer_parameters"><code class="docutils literal notranslate"><span class="pre">layer_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.load_state_dict"><code class="docutils literal notranslate"><span class="pre">load_state_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.parameters"><code class="docutils literal notranslate"><span class="pre">parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.print_parameters"><code class="docutils literal notranslate"><span class="pre">print_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.set_geometric_parameters"><code class="docutils literal notranslate"><span class="pre">set_geometric_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.parameters_utils.state_dict"><code class="docutils literal notranslate"><span class="pre">state_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.preprocessing_utils">pytorch_tools.preprocessing_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.preprocessing_utils.train_val_test_split"><code class="docutils literal notranslate"><span class="pre">train_val_test_split()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.tensor_utils">pytorch_tools.tensor_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.add_noise"><code class="docutils literal notranslate"><span class="pre">add_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.cat"><code class="docutils literal notranslate"><span class="pre">cat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.cumsum"><code class="docutils literal notranslate"><span class="pre">cumsum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.generator_from_seed"><code class="docutils literal notranslate"><span class="pre">generator_from_seed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.intersect1d"><code class="docutils literal notranslate"><span class="pre">intersect1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.isnan"><code class="docutils literal notranslate"><span class="pre">isnan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.isnan_any"><code class="docutils literal notranslate"><span class="pre">isnan_any()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.map_tensor_with_tensor"><code class="docutils literal notranslate"><span class="pre">map_tensor_with_tensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.numpy_array"><code class="docutils literal notranslate"><span class="pre">numpy_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.random_gaussian"><code class="docutils literal notranslate"><span class="pre">random_gaussian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.random_mask"><code class="docutils literal notranslate"><span class="pre">random_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.random_sample_between_interval"><code class="docutils literal notranslate"><span class="pre">random_sample_between_interval()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensor_utils.vstack"><code class="docutils literal notranslate"><span class="pre">vstack()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.tensorboard_utils">pytorch_tools.tensorboard_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.tensorboard_utils.df_tensorboard"><code class="docutils literal notranslate"><span class="pre">df_tensorboard()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.torch_display_utils">pytorch_tools.torch_display_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pytorch_tools.html#pytorch_tools.torch_display_utils.set_printoptions"><code class="docutils literal notranslate"><span class="pre">set_printoptions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#pytorch-tools-train-test-geometric-utils-module">pytorch_tools.train_test_geometric_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.training_layer_utils">pytorch_tools.training_layer_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools.xai_geometric_utils">pytorch_tools.xai_geometric_utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pytorch_tools.html#module-pytorch_tools">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to pytorch_tools’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pytorch_tools.html" class="btn btn-neutral float-right" title="pytorch_tools package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pytorch_tools.geometric_tensor_utils &mdash; pytorch_tools  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pytorch_tools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pytorch_tools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pytorch_tools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pytorch_tools.geometric_tensor_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pytorch_tools.geometric_tensor_utils</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch_geometric.nn</span> <span class="k">as</span> <span class="nn">nn</span> 
+<span class="kn">import</span> <span class="nn">torch_geometric.nn</span> <span class="k">as</span> <span class="nn">nn_geo</span>
+
+<span class="c1">#global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool</span>
+
+<div class="viewcode-block" id="global_mean_weighted_pool"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.geometric_tensor_utils.global_mean_weighted_pool">[docs]</a><span class="k">def</span> <span class="nf">global_mean_weighted_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">batch</span><span class="p">,</span><span class="n">weights</span><span class="p">,</span><span class="n">debug_nan</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: To do a weighted mean pooling for </span>
+<span class="sd">    a batch</span>
+<span class="sd">    </span>
+<span class="sd">    Ex: </span>
+<span class="sd">    from pytorch_tools import tensor_utils as tenu</span>
+<span class="sd">    x = torch.Tensor([70,80,90,100,110,120])</span>
+<span class="sd">    w = torch.Tensor([10,5,15,10,5,15])</span>
+<span class="sd">    batch = torch.tensor(np.array([0,0,0,1,1,1]),dtype=torch.int64)</span>
+<span class="sd">    tenu.global_mean_weighted_pool(x,batch,w)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">debug_nan</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tenu</span><span class="o">.</span><span class="n">isnan_any</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nan batch&quot;</span><span class="p">)</span>
+    <span class="n">weight_sum</span> <span class="o">=</span> <span class="n">nn_geo</span><span class="o">.</span><span class="n">global_add_pool</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
+    
+    
+    <span class="k">if</span> <span class="n">debug_nan</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tenu</span><span class="o">.</span><span class="n">isnan_any</span><span class="p">(</span><span class="n">weight_sum</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nan weight_sum&quot;</span><span class="p">)</span>
+    <span class="n">weighted_value_sum</span> <span class="o">=</span> <span class="n">nn_geo</span><span class="o">.</span><span class="n">global_add_pool</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">weights</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug_nan</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tenu</span><span class="o">.</span><span class="n">isnan_any</span><span class="p">(</span><span class="n">weighted_value_sum</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nan weighted_value_sum&quot;</span><span class="p">)</span>
+    
+    <span class="n">weight_result</span> <span class="o">=</span> <span class="n">weighted_value_sum</span><span class="o">/</span><span class="n">weight_sum</span>
+    <span class="n">weight_result</span><span class="p">[</span><span class="n">weight_result</span> <span class="o">!=</span> <span class="n">weight_result</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">if</span> <span class="n">debug_nan</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tenu</span><span class="o">.</span><span class="n">isnan_any</span><span class="p">(</span><span class="n">weight_result</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Nan weight_result&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">weight_result</span></div>
+
+<div class="viewcode-block" id="global_mean_pool"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.geometric_tensor_utils.global_mean_pool">[docs]</a><span class="k">def</span> <span class="nf">global_mean_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">batch</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">nn_geo</span><span class="o">.</span><span class="n">global_mean_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="n_in_pool_from_pool_tensor"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.geometric_tensor_utils.n_in_pool_from_pool_tensor">[docs]</a><span class="k">def</span> <span class="nf">n_in_pool_from_pool_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">global_add_pool</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="pool_idx_from_pool_tensor"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.geometric_tensor_utils.pool_idx_from_pool_tensor">[docs]</a><span class="k">def</span> <span class="nf">pool_idx_from_pool_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">global_mean_pool</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span><span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="normalize_in_pool_from_pool_tensor"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.geometric_tensor_utils.normalize_in_pool_from_pool_tensor">[docs]</a><span class="k">def</span> <span class="nf">normalize_in_pool_from_pool_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">numb_in_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">global_add_pool</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+    <span class="n">normalize_over_pool</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">numb_in_pool</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">/</span><span class="n">numb_in_pool</span>
+    <span class="k">return</span> <span class="n">normalize_over_pool</span><span class="p">[</span><span class="n">tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="ptr_from_pool_tensor"><a class="viewcode-back" href="../../pytorch_tools.html#pytorch_tools.geometric_tensor_utils.ptr_from_pool_tensor">[docs]</a><span class="k">def</span> <span class="nf">ptr_from_pool_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Purpose: to compute a new ptr tensor from</span>
+<span class="sd">    a pool tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">gtu</span><span class="o">.</span><span class="n">n_in_pool_from_pool_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">),</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">new_ptr</span> <span class="o">=</span>  <span class="n">torch</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ptr</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_ptr</span></div>
+
+
+<span class="c1">#--- from pytorch_tools ---</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">tensor_utils</span> <span class="k">as</span> <span class="n">tenu</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">geometric_tensor_utils</span> <span class="k">as</span> <span class="n">gtu</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Brendan Celii.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
