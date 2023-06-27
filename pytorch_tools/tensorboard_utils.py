@@ -1,14 +1,16 @@
-"""# how to run tensorboard inside a docker container
+'''
+# how to run tensorboard inside a docker container
 %load_ext tensorboard
 %tensorboard --logdir /neuron_mesh_tools/Auto_Proofreading/Minnie65_Analysis/GNN_Classification/GNN_Models/runs --bind_all
 
-"""
 
+'''
+from pathlib import Path
+from tensorboard.backend.event_processing.event_file_loader import EventFileLoader
 import os
 import pandas as pd
-from pathlib import Path
+
 #from tensorflow.python.summary.summary_iterator import summary_iterator
-from tensorboard.backend.event_processing.event_file_loader import EventFileLoader
 
 def df_tensorboard(
     root_dir=None,
@@ -81,4 +83,5 @@ def df_tensorboard(
     return all_df.reset_index(drop=True)
 
 
-import tensorboard_utils as tbu
+
+from . import tensorboard_utils as tbu

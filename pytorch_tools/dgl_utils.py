@@ -1,7 +1,7 @@
+
 import dgl
 import networkx as nx
 import numpy as np
-import networkx_utils as xu
 
 def g_from_data(data,binary_tree = True):
     """
@@ -55,5 +55,8 @@ def from_networkx(
         
     return new_G
 
-import dgl_utils as dglu
     
+#--- from python_tools ---
+from python_tools import networkx_utils as xu
+
+from . import dgl_utils as dglu

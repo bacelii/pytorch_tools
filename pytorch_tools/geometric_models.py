@@ -1,19 +1,124 @@
-import torch
-from torch.nn import Linear
-import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
-from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool,global_max_pool
-import numpy as np
-import torch as th
-import torch.nn as nn
-import geometric_tensor_utils as gtu
-"""
+'''
+
 Notes: 
 Usually only have to use the batch variable when doing global pooling
 
 
 
+
+
+
+Source: https://github.com/AntonioLonga/PytorchGeometricTutorial/blob/main/Tutorial16/Tutorial16.ipynb
+
+Note: This requires the data to be a dense matrix 
+1. so need to T.ToDense() transform
+2. and the DenseDataLoader
+
+-- Still had bugs and couldn't get to work
+
+
+
+
+
+Official source: https://github.com/RexYing/diffpool
+
+pyg implementation paper source = https://github.com/VoVAllen/diffpool
+
+
+
+Tutorial: https://docs.dgl.ai/en/0.6.x/tutorials/models/2_small_graph/3_tree-lstm.html 
+
+Code: https://github.com/dmlc/dgl/blob/master/examples/pytorch/tree_lstm/tree_lstm.py
+
+Improved Semantic Representations From Tree-Structured Long Short-Term Memory Networks
+https://arxiv.org/abs/1503.00075
+
+
+
+from . import geometric_models as gm
+sys.path.append("/pytorch_tools/pytorch_tools/HGP_SL")
+import models
+
+model_name = "HGP_SL"
+n_epochs = 500
+
+
+architecture_kwargs = dict(
+    n_hidden_channels = 8, 
+    #first_heads=8, 
+    #output_heads=1, 
+    #dropout=0.6,
+    #global_pool_type="mean"
+)
+
+model = models.Model(
+    dataset_num_node_features=dataset.num_node_features,
+    dataset_num_classes=dataset.num_classes,
+    **architecture_kwargs
+    )
+
+
+
+
+GraphSAGE did not import: 
+
+from torch_geometric.nn import SAGEConv
 """
+Source: https://colab.research.google.com/github/sachinsharma9780/interactive_tutorials/blob/master/notebooks/example_output/Comprehensive_GraphSage_Guide_with_PyTorchGeometric_Output.ipynb#scrollTo=ROXBserO_amj
+
+
+How GraphSAGE is different: 
+
+The GraphSage is different from GCNs is two ways: i.e.
+1) Instead of taking the entire K-hop neighborhood of a 
+    target node, GraphSage first samples or prune the K-hop
+    neighborhood computation graph and then perform the 
+    feature aggregation operation on this sampled graph 
+    in order to generate the embeddings for a target node. 
+2) During the learning process, in order to generate the node
+    embeddings; GraphSage learns the aggregator function 
+    whereas GCNs make use of the symmetrically normalized 
+    graph Laplacian.
+
+"""
+class SAGE(torch.nn.Module):
+    def __init__(
+        self, 
+        dataset_num_node_features,
+        n_hidden_channels, 
+        dataset_num_classes,
+        n_layers=3):
+        super(SAGE, self).__init__()
+
+        self.num_layers = n_layers
+
+        self.convs = torch.nn.ModuleList()
+        self.convs.append(SAGEConv(dataset_num_node_features, n_hidden_channels))
+        for _ in range(n_layers - 2):
+            self.convs.append(SAGEConv(n_hidden_channels, n_hidden_channels))
+        self.convs.append(SAGEConv(n_hidden_channels, dataset_num_classes))
+
+    def reset_parameters(self):
+        for conv in self.convs:
+            conv.reset_parameters()
+
+
+'''
+from collections import namedtuple
+from math import ceil
+from torch.nn import Linear
+from torch_geometric.nn import DenseGCNConv as DenseGCNConv, dense_diff_pool
+from torch_geometric.nn import GATConv
+from torch_geometric.nn import GCNConv
+from torch_geometric.nn import SAGEConv
+from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool,global_max_pool
+import dgl
+import dgl.function as fn
+import numpy as np
+import torch
+import torch as th
+import torch.nn as nn
+import torch.nn.functional as F
 class Classifier(nn.Module):
     def __init__(
         self,
@@ -148,7 +253,6 @@ class ClassifierFlat(nn.Module):
 
 # ---------------- basic graph neural network models -----------
 # Define our GCN class as a pytorch Module
-import geometric_tensor_utils as gtu
 class GCNFlat(torch.nn.Module):
     def __init__(
         self, 
@@ -227,7 +331,6 @@ class GCNFlat(torch.nn.Module):
         x = self.lin(x)
         return F.softmax(x,dim=1)
     
-import numpy_utils as nu
 class GCNHierarchical(torch.nn.Module):
     """
     Purpose: To run a GCN model but with 
@@ -748,8 +851,6 @@ class GCNHierarchicalOld(torch.nn.Module):
     
 # ------------ FOR GRAPH SAGE IMPLEMENTATION --------------
 # Define our GCN class as a pytorch Module
-from torch_geometric.nn import SAGEConv
-from torch.nn import Linear
 class SAGEConvNet(torch.nn.Module):
     def __init__(
         self, 
@@ -947,8 +1048,6 @@ class GCN(torch.nn.Module):
     
     
 # ---------- Graph Attention Network -------------
-from torch_geometric.nn import GATConv
-import torch.nn as nn
 
 class GAT(nn.Module):
     """
@@ -1236,20 +1335,8 @@ class GraphSAGE(nn.Module):
 
     
 # ---- simple diff pool -------------
-"""
-Source: https://github.com/AntonioLonga/PytorchGeometricTutorial/blob/main/Tutorial16/Tutorial16.ipynb
-
-Note: This requires the data to be a dense matrix 
-1. so need to T.ToDense() transform
-2. and the DenseDataLoader
-
--- Still had bugs and couldn't get to work
 
 
-"""
-
-
-from torch_geometric.nn import DenseGCNConv as DenseGCNConv, dense_diff_pool
 class DiffPoolSimpleGNN(torch.nn.Module):
     
     def __init__(
@@ -1293,7 +1380,6 @@ class DiffPoolSimpleGNN(torch.nn.Module):
                 x = self.bns[step](x)
         
         return x
-from math import ceil
 class DiffPoolGCN(torch.nn.Module):
     dense_adj = True
     def __init__(
@@ -1393,11 +1479,6 @@ class DiffPoolGCN(torch.nn.Module):
     
     
 # ----------- Graph Sage and Diff Pool ----------
-"""
-Official source: https://github.com/RexYing/diffpool
-
-pyg implementation paper source = https://github.com/VoVAllen/diffpool
-"""
 
 
 class BatchedDiffPool(nn.Module):
@@ -1563,18 +1644,8 @@ class DiffPoolSAGE(nn.Module):
         return loss
     
 # --------------------- TREE LSTM MODEL ------------------------
-"""
-Tutorial: https://docs.dgl.ai/en/0.6.x/tutorials/models/2_small_graph/3_tree-lstm.html 
-
-Code: https://github.com/dmlc/dgl/blob/master/examples/pytorch/tree_lstm/tree_lstm.py
-
-Improved Semantic Representations From Tree-Structured Long Short-Term Memory Networks
-https://arxiv.org/abs/1503.00075
-"""
     
 
-from collections import namedtuple
-import dgl
 
 class ChildSumTreeLSTMCell(nn.Module):
     def __init__(self, x_size, h_size):
@@ -1626,9 +1697,6 @@ class TreeLSTMCell(nn.Module):
         h = o * th.tanh(c)
         return {'h' : h, 'c' : c}
 
-import dgl.function as fn
-import torch as th
-import dgl_utils as dglu
 
 class TreeLSTM(nn.Module):
     directed = True
@@ -1734,72 +1802,10 @@ class TreeLSTM(nn.Module):
         return F.softmax(logits, dim=-1)
     
 # ------------- Models that did not work ------------
-"""
-import geometric_models as gm
-sys.path.append("/pytorch_tools/pytorch_tools/HGP_SL")
-import models
 
-model_name = "HGP_SL"
-n_epochs = 500
+#--- from pytorch_tools ---
+from . import dgl_utils as dglu
+from . import geometric_tensor_utils as gtu
 
-
-architecture_kwargs = dict(
-    n_hidden_channels = 8, 
-    #first_heads=8, 
-    #output_heads=1, 
-    #dropout=0.6,
-    #global_pool_type="mean"
-)
-
-model = models.Model(
-    dataset_num_node_features=dataset.num_node_features,
-    dataset_num_classes=dataset.num_classes,
-    **architecture_kwargs
-    )
-
-"""
-
-'''
-GraphSAGE did not import: 
-
-from torch_geometric.nn import SAGEConv
-"""
-Source: https://colab.research.google.com/github/sachinsharma9780/interactive_tutorials/blob/master/notebooks/example_output/Comprehensive_GraphSage_Guide_with_PyTorchGeometric_Output.ipynb#scrollTo=ROXBserO_amj
-
-
-How GraphSAGE is different: 
-
-The GraphSage is different from GCNs is two ways: i.e.
-1) Instead of taking the entire K-hop neighborhood of a 
-    target node, GraphSage first samples or prune the K-hop
-    neighborhood computation graph and then perform the 
-    feature aggregation operation on this sampled graph 
-    in order to generate the embeddings for a target node. 
-2) During the learning process, in order to generate the node
-    embeddings; GraphSage learns the aggregator function 
-    whereas GCNs make use of the symmetrically normalized 
-    graph Laplacian.
-
-"""
-class SAGE(torch.nn.Module):
-    def __init__(
-        self, 
-        dataset_num_node_features,
-        n_hidden_channels, 
-        dataset_num_classes,
-        n_layers=3):
-        super(SAGE, self).__init__()
-
-        self.num_layers = n_layers
-
-        self.convs = torch.nn.ModuleList()
-        self.convs.append(SAGEConv(dataset_num_node_features, n_hidden_channels))
-        for _ in range(n_layers - 2):
-            self.convs.append(SAGEConv(n_hidden_channels, n_hidden_channels))
-        self.convs.append(SAGEConv(n_hidden_channels, dataset_num_classes))
-
-    def reset_parameters(self):
-        for conv in self.convs:
-            conv.reset_parameters()
-
-'''
+#--- from python_tools ---
+from python_tools import numpy_utils as nu

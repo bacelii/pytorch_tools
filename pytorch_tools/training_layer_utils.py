@@ -1,4 +1,5 @@
-"""
+'''
+
 How to use Batchnorm ---- done before the activation -----
 
 
@@ -38,4 +39,5 @@ class Net(nn.Module):
 
 
 
-"""
+
+'''

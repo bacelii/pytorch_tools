@@ -1,3 +1,4 @@
+
 import torch
 
 
@@ -34,4 +35,5 @@ def load_checkpoint_to_model(filepath,model):
     return model
     
 
-import model_utils as mdlu
+
+from . import model_utils as mdlu

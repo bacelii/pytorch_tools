@@ -1,3 +1,4 @@
+
 import torch
 
 def map_tensor_with_tensor(tensor,tensor_map):
@@ -83,5 +84,6 @@ def intersect1d(tensor1,tensor2,return_mask=False,):
     else:
         return tensor1[indices]  
 
-import tensor_utils as tenu
     
+
+from . import tensor_utils as tenu

@@ -1,22 +1,20 @@
-"""
+'''
+
 Purpose: To store functions that help with training and testing
 
-"""
 
-import torch.nn.functional as F
-import torch
-import evaluation_utils as evu
+'''
 import numpy as np
-import parameters_utils as paru
-
 import pandas as pd
+import torch
+import torch.nn.functional as F
+
+
 
 
 eps=1e-13
 
 
-import tensor_utils as tenu
-import data_augmentation_utils as dau
 
 def forward_pass(
     model,
@@ -243,8 +241,6 @@ def forward_pass(
         
         
         
-import general_utils as gu
-import pandas_utils as pu
 def forward_pass_embed_df(
     #arguments for the forward pass
     model,
@@ -294,5 +290,16 @@ def forward_pass_embed_df(
             
     return embedding_df
 
-import train_test_geometric_utils as ttu
     
+
+#--- from pytorch_tools ---
+from . import data_augmentation_utils as dau
+from . import evaluation_utils as evu
+from . import parameters_utils as paru
+from . import tensor_utils as tenu
+
+#--- from python_tools ---
+from python_tools import general_utils as gu
+from python_tools import pandas_utils as pu
+
+from . import train_test_geometric_utils as ttu

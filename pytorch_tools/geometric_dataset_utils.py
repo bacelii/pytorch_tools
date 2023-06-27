@@ -1,37 +1,29 @@
-import numpy as np
-import pandas_utils as pu
-import pandas as pd
 
+from copy import deepcopy
 from pathlib import Path
-import time
-
-#python_tools modules
-import system_utils as su
-import pandas_utils as pu
-import pandas as pd
-import numpy as np
-import numpy_utils as nu
-import networkx_utils as xu
-from tqdm_utils import tqdm
-
-#neuron_morphology_tools modules
-import neuron_nx_io as nxio
-
-#pytorch and pytorch geometric modeuls
-import torch
-import torch_geometric.transforms as T
-from torch_geometric.nn import GCNConv
-from torch_geometric.utils import train_test_split_edges
-from torch_geometric.data import Data
 from torch_geometric import transforms
-
-# for the dataset object
+from torch_geometric.data import Data
+from torch_geometric.data import DenseDataLoader
 from torch_geometric.data import InMemoryDataset, download_url
 from torch_geometric.loader import DataLoader
-from torch_geometric.data import DenseDataLoader
+from torch_geometric.nn import GCNConv
+from torch_geometric.utils import train_test_split_edges
+import numpy as np
+import pandas as pd
+import time
+import torch
+import torch_geometric.transforms as T
+
+
+#python_tools modules
+
+#neuron_morphology_tools modules
+
+#pytorch and pytorch geometric modeuls
+
+# for the dataset object
 
 #pytorch_tools modules
-import preprocessing_utils as pret
 
 x_prefix_global = "x_pool"
 feature_name_suffix_global = "features"
@@ -552,7 +544,6 @@ def pool_array_names(df):
     return [k for k in cols if "pool" in k and 
              ("features" not in k) and ("names" not in k)]
 
-from tqdm_utils import tqdm
 def normalize_and_filter_x_columns(
     df,
     normalization_df=None,
@@ -699,7 +690,6 @@ def pytorch_data_hierarchical_from_single_data(
     data = DataHierarchical(**data_prep)
     return data
 
-import regex_utils as reu
 def load_data_hierarchical(
     df,
     graph_label,
@@ -942,7 +932,7 @@ def closest_neighbors_in_embedding_df(
     
     
     Ex: 
-    from dataInterfaceMinnie65 import data_interface as hdju_m65
+    from meshAfterParty.dataInterfaceMinnie65 import data_interface as hdju_m65
     closest_neighbors_in_embedding_df(
         df = data_source_df,
         data_name = "864691134884769786_0",
@@ -1014,8 +1004,6 @@ pool_attributes_affected_by_nodes = [
     "pool1",
 ]
 
-from copy import deepcopy
-import tensor_utils as tenu
 
 def set_ptr(data,return_ptr = False):
     """
@@ -1028,7 +1016,6 @@ def set_ptr(data,return_ptr = False):
     else:
         data.ptr = ptr
         
-import time
 def drop_nodes(
     data,
     mask=None,
@@ -1053,7 +1040,7 @@ def drop_nodes(
     Ex: 
     from torch_geometric.data import Data
     import numpy as np
-    import geometric_dataset_utils as gdu
+    from pytorch_tools import geometric_dataset_utils as gdu
 
     d = gdu.example_data_obj()
     new_d = gdu.drop_nodes(
@@ -1283,4 +1270,19 @@ def drop_limbs(
     )
 
 
-import geometric_dataset_utils as gdu
+#--- from pytorch_tools ---
+from . import preprocessing_utils as pret
+from . import tensor_utils as tenu
+
+#--- from neuron_morphology_tools ---
+from neuron_morphology_tools import neuron_nx_io as nxio
+
+#--- from python_tools ---
+from python_tools import networkx_utils as xu
+from python_tools import numpy_utils as nu
+from python_tools import pandas_utils as pu
+from python_tools import regex_utils as reu
+from python_tools import system_utils as su
+from python_tools.tqdm_utils import tqdm
+
+from . import geometric_dataset_utils as gdu

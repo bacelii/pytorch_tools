@@ -1,5 +1,6 @@
-import torch
+
 from collections import OrderedDict
+import torch
 
 def layer_bias(layer):
     return layer.bias
@@ -78,7 +79,6 @@ def print_parameters(
         verbose = True,
         print_extrema = print_extrema,)
     
-import tensor_utils as tsu
 def isnan_in_parameters(model,verbose = False):
     return_value = False
     for name,param in model.named_parameters():
@@ -93,3 +93,5 @@ def add_noise_to_parameters(model,noise_amplitude = 0.1 ):
     with torch.no_grad():
         for param in model.parameters():
             param.add_(torch.randn(param.size()) * noise_amplitude)
+#--- from pytorch_tools ---
+from . import tensor_utils as tsu

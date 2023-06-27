@@ -1,18 +1,19 @@
+
+from torch import Tensor
+from torch_geometric.nn import GCNConv as gc
+from torch_geometric.typing import Adj, OptTensor, PairTensor
 from torch_geometric.utils import add_remaining_self_loops
 from typing import Optional, Tuple
-from torch_geometric.typing import Adj, OptTensor, PairTensor
-
+from typing import Union
+import copy
 import torch
-from torch import Tensor
+import torch_sparse
+
 
 add_remaining_self_loops
-from torch_geometric.nn import GCNConv as gc
-from typing import Union
 #from types import NoneType
 
-import copy
 
-import torch_sparse
 
 class GCNConv(gc):
     def __init__(self,in_channels: int, out_channels: int,

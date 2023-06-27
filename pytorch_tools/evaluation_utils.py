@@ -1,3 +1,5 @@
+
+import numpy as np
 import torch
 
 def metric_pre(
@@ -110,7 +112,6 @@ def accuracy(
     accuracy.requires_grad = is_training
     return accuracy
 
-import numpy as np
 def metric_dict(
     y_true:torch.Tensor,
     y_pred:torch.Tensor,
@@ -137,4 +138,5 @@ def metric_dict(
         evaluation_metrics = {k:v for k,v in evaluation_metrics.items() if k in metrics}
     return  evaluation_metrics
 
-import evaluation_utils as evu
+
+from . import evaluation_utils as evu

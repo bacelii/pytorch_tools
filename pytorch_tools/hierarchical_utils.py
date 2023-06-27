@@ -1,19 +1,16 @@
-#torch modules
-import torch
+
 from torch.nn import Linear
-import torch.nn.functional as F
-#from torch_geometric.nn import GCNConv
-from geometric_models_overload import GCNConv
 from torch_geometric.nn import global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool,global_max_pool
 import numpy as np
+import pandas as pd
+import torch
 import torch as th
 import torch.nn as nn
-import geometric_tensor_utils as gtu
-from geometric_models import ClassifierBase
+import torch.nn.functional as F#torch modules
+#from torch_geometric.nn import GCNConv
 
 
 #custom modules
-import numpy_utils as nu
 
 class GCNHierarchicalClassifier(torch.nn.Module):
     """
@@ -469,20 +466,11 @@ class GCNHierarchicalClassifier(torch.nn.Module):
     
 # ----------- For doing the forward pass ----
 
-import torch.nn.functional as F
-import torch
-import evaluation_utils as evu
-import numpy as np
-import parameters_utils as paru
 
-import pandas as pd
 eps=1e-13
 
-import tensor_utils as tenu
-import data_augmentation_utils as dau
 
 # -- for helping compute the weighted loss --
-import geometric_tensor_utils as gtu
 
 def hierarchical_loss(
     loss_function,
@@ -908,7 +896,6 @@ def forward_pass(
                 
         
         
-import hierarchical_utils as hru
             
         
             
@@ -924,3 +911,16 @@ import hierarchical_utils as hru
     
     
     
+#--- from pytorch_tools ---
+from . import data_augmentation_utils as dau
+from . import evaluation_utils as evu
+from . import geometric_tensor_utils as gtu
+from . import parameters_utils as paru
+from . import tensor_utils as tenu
+from .geometric_models import ClassifierBase
+from .geometric_models_overload import GCNConv
+
+#--- from python_tools ---
+from python_tools import numpy_utils as nu
+
+from . import hierarchical_utils as hru

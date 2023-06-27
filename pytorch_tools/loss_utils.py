@@ -1,4 +1,5 @@
-"""
+'''
+
 Cross Entropy Loss (Log Likelihood):
 
 Overall Idea: 
@@ -161,4 +162,5 @@ All 3 of these models would produce the same output
     criterion(out,curr_data.y)
 
 
-"""
+
+'''

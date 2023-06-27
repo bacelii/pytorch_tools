@@ -1,17 +1,17 @@
+
 import torch
-
 import torch_geometric.nn as nn 
-#global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
-import tensor_utils as tenu
-
 import torch_geometric.nn as nn_geo
+
+#global_mean_pool,global_add_pool,global_mean_pool,global_sort_pool
+
 def global_mean_weighted_pool(x,batch,weights,debug_nan = False):
     """
     Purpose: To do a weighted mean pooling for 
     a batch
     
     Ex: 
-    import tensor_utils as tenu
+    from pytorch_tools import tensor_utils as tenu
     x = torch.Tensor([70,80,90,100,110,120])
     w = torch.Tensor([10,5,15,10,5,15])
     batch = torch.tensor(np.array([0,0,0,1,1,1]),dtype=torch.int64)
@@ -65,4 +65,8 @@ def ptr_from_pool_tensor(tensor):
     new_ptr =  torch.hstack([torch.zeros(1),ptr]).to(dtype=torch.int64)
     return new_ptr
 
-import geometric_tensor_utils as gtu
+
+#--- from pytorch_tools ---
+from . import tensor_utils as tenu
+
+from . import geometric_tensor_utils as gtu

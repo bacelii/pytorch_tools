@@ -1,4 +1,5 @@
-"""
+'''
+
 Deepmind paper that talks about training with high confidence samples: 
 
 https://www.nature.com/articles/s41586-021-03819-2.pdf
@@ -33,14 +34,16 @@ for epoch in range(10): # begin training loop
     
     x, y = new_data.x, new_data.y
     ...
-"""
 
+'''
+from copy import deepcopy
+import numpy as np
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch_geometric as tg
-import tensor_utils as tenu
-import numpy_utils as nu
+
 
 # ----------- utility functions for augmentation classes ----- 
 pool_attributes_affected_by_nodes = [
@@ -48,8 +51,6 @@ pool_attributes_affected_by_nodes = [
     "pool1",
 ]
 
-from copy import deepcopy
-import tensor_utils as tenu
 
 def set_ptr(data,return_ptr = False):
     """
@@ -80,8 +81,6 @@ def mask_addition_if_totally_eliminated(data,mask):
     
     return mask_fix
 
-import time
-import numpy as np
 def drop_nodes(
     data,
     mask=None,
@@ -106,7 +105,7 @@ def drop_nodes(
     Ex: 
     from torch_geometric.data import Data
     import numpy as np
-    import geometric_dataset_utils as gdu
+    from pytorch_tools import geometric_dataset_utils as gdu
 
     d = dau.example_data_obj()
     new_d = dau.drop_nodes(
@@ -381,7 +380,6 @@ class NodeFeatureMask(nn.Module):
         data.x = data.x[:,tenu.random_mask(data.x.shape[1],p=self.p)]
         return data
     
-import geometric_dataset_utils as gdu
 class NodeDrop(nn.Module):
     def __init__(self,p = 0.1,clone=clone_default,**kwargs):
         super().__init__()
@@ -437,7 +435,6 @@ def compose_augmentation(
     
     
     
-import data_augmentation_utils as dau
 '''
 class NodeDrop(nn.Module):
     def __init__(self, p=0.05):
@@ -458,3 +455,11 @@ class NodeDrop(nn.Module):
 
         return new_data
 '''
+#--- from pytorch_tools ---
+from . import geometric_dataset_utils as gdu
+from . import tensor_utils as tenu
+
+#--- from python_tools ---
+from python_tools import numpy_utils as nu
+
+from . import data_augmentation_utils as dau
