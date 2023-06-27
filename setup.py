@@ -11,6 +11,8 @@ def get_install_requires(filepath=None):
     if fname.exists():
         with open(fname, 'r') as f:
             targets = f.read().splitlines()
+            
+    targets = [k for k in targets if "http" not in k]
     return targets
 
 def get_links():
