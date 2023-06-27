@@ -46,7 +46,20 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">pytorch_tools</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">pytorch_tools package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#pytorch-tools-data-augmentation-utils-module">pytorch_tools.data_augmentation_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.data_augmentation_utils">pytorch_tools.data_augmentation_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.Compose"><code class="docutils literal notranslate"><span class="pre">Compose</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.LimbDrop"><code class="docutils literal notranslate"><span class="pre">LimbDrop</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.NodeDrop"><code class="docutils literal notranslate"><span class="pre">NodeDrop</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.NodeFeatureMask"><code class="docutils literal notranslate"><span class="pre">NodeFeatureMask</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.NodeFeatureNoise"><code class="docutils literal notranslate"><span class="pre">NodeFeatureNoise</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.compose_augmentation"><code class="docutils literal notranslate"><span class="pre">compose_augmentation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.drop_limbs"><code class="docutils literal notranslate"><span class="pre">drop_limbs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.drop_nodes"><code class="docutils literal notranslate"><span class="pre">drop_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.mask_addition_if_totally_eliminated"><code class="docutils literal notranslate"><span class="pre">mask_addition_if_totally_eliminated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.pool_idx_stacked"><code class="docutils literal notranslate"><span class="pre">pool_idx_stacked()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.data_augmentation_utils.set_ptr"><code class="docutils literal notranslate"><span class="pre">set_ptr()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.dgl_utils">pytorch_tools.dgl_utils module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.dgl_utils.from_networkx"><code class="docutils literal notranslate"><span class="pre">from_networkx()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.dgl_utils.g_from_data"><code class="docutils literal notranslate"><span class="pre">g_from_data()</span></code></a></li>
@@ -62,7 +75,26 @@
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.evaluation_utils.true_false_pos_neg"><code class="docutils literal notranslate"><span class="pre">true_false_pos_neg()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#pytorch-tools-geometric-dataset-utils-module">pytorch_tools.geometric_dataset_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.geometric_dataset_utils">pytorch_tools.geometric_dataset_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.DataHierarchical"><code class="docutils literal notranslate"><span class="pre">DataHierarchical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.closest_neighbors_in_embedding_df"><code class="docutils literal notranslate"><span class="pre">closest_neighbors_in_embedding_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.drop_limbs"><code class="docutils literal notranslate"><span class="pre">drop_limbs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.drop_nodes"><code class="docutils literal notranslate"><span class="pre">drop_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.example_data_obj"><code class="docutils literal notranslate"><span class="pre">example_data_obj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.int_label_map"><code class="docutils literal notranslate"><span class="pre">int_label_map()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.load_data"><code class="docutils literal notranslate"><span class="pre">load_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.load_data_hierarchical"><code class="docutils literal notranslate"><span class="pre">load_data_hierarchical()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.normalization_df"><code class="docutils literal notranslate"><span class="pre">normalization_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.normalization_df_hierarchical"><code class="docutils literal notranslate"><span class="pre">normalization_df_hierarchical()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.normalize_and_filter_x_columns"><code class="docutils literal notranslate"><span class="pre">normalize_and_filter_x_columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.pool_array_names"><code class="docutils literal notranslate"><span class="pre">pool_array_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.pool_idx_stacked"><code class="docutils literal notranslate"><span class="pre">pool_idx_stacked()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.pytorch_data_hierarchical_from_single_data"><code class="docutils literal notranslate"><span class="pre">pytorch_data_hierarchical_from_single_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.set_ptr"><code class="docutils literal notranslate"><span class="pre">set_ptr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.x_column_feature_name"><code class="docutils literal notranslate"><span class="pre">x_column_feature_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_dataset_utils.x_columns"><code class="docutils literal notranslate"><span class="pre">x_columns()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.geometric_models">pytorch_tools.geometric_models module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_models.BatchedDiffPool"><code class="docutils literal notranslate"><span class="pre">BatchedDiffPool</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_models.BatchedGraphSAGE"><code class="docutils literal notranslate"><span class="pre">BatchedGraphSAGE</span></code></a></li>
@@ -102,7 +134,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.geometric_utils.from_networkx"><code class="docutils literal notranslate"><span class="pre">from_networkx()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#pytorch-tools-hierarchical-utils-module">pytorch_tools.hierarchical_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.hierarchical_utils">pytorch_tools.hierarchical_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier"><code class="docutils literal notranslate"><span class="pre">GCNHierarchicalClassifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.hierarchical_utils.forward_pass"><code class="docutils literal notranslate"><span class="pre">forward_pass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.hierarchical_utils.hierarchical_loss"><code class="docutils literal notranslate"><span class="pre">hierarchical_loss()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.loss_utils">pytorch_tools.loss_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.model_utils">pytorch_tools.model_utils module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.model_utils.load_checkpoint_to_model"><code class="docutils literal notranslate"><span class="pre">load_checkpoint_to_model()</span></code></a></li>
@@ -151,7 +188,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.torch_display_utils.set_printoptions"><code class="docutils literal notranslate"><span class="pre">set_printoptions()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#pytorch-tools-train-test-geometric-utils-module">pytorch_tools.train_test_geometric_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.train_test_geometric_utils">pytorch_tools.train_test_geometric_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.train_test_geometric_utils.forward_pass"><code class="docutils literal notranslate"><span class="pre">forward_pass()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pytorch_tools.train_test_geometric_utils.forward_pass_embed_df"><code class="docutils literal notranslate"><span class="pre">forward_pass_embed_df()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.training_layer_utils">pytorch_tools.training_layer_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools.xai_geometric_utils">pytorch_tools.xai_geometric_utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-pytorch_tools">Module contents</a></li>
@@ -191,8 +232,266 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
-<section id="pytorch-tools-data-augmentation-utils-module">
-<h2>pytorch_tools.data_augmentation_utils module<a class="headerlink" href="#pytorch-tools-data-augmentation-utils-module" title="Permalink to this heading"></a></h2>
+<section id="module-pytorch_tools.data_augmentation_utils">
+<span id="pytorch-tools-data-augmentation-utils-module"></span><h2>pytorch_tools.data_augmentation_utils module<a class="headerlink" href="#module-pytorch_tools.data_augmentation_utils" title="Permalink to this heading"></a></h2>
+<p>Deepmind paper that talks about training with high confidence samples:</p>
+<p><a class="reference external" href="https://www.nature.com/articles/s41586-021-03819-2.pdf">https://www.nature.com/articles/s41586-021-03819-2.pdf</a>
+- noisy student self-distillation</p>
+<p><a class="reference external" href="https://github.com/rish-16/grafog">https://github.com/rish-16/grafog</a>
+- general procedure
+1) Write a class that inherits from module and overloads the forward function</p>
+<ol class="arabic simple" start="2">
+<li><p>create composition of node and edge augmentations</p></li>
+<li><p>At every epoch fun the data through the augmentation</p></li>
+</ol>
+<p>Ex:</p>
+<dl class="simple">
+<dt>node_aug = T.Compose([</dt><dd><p>T.NodeDrop(p=0.45),
+T.NodeMixUp(lamb=0.5, classes=7),
+…</p>
+</dd>
+</dl>
+<p>])</p>
+<dl class="simple">
+<dt>edge_aug = T.Compose([</dt><dd><p>T.EdgeDrop(0=0.15),
+T.EdgeFeatureMasking()</p>
+</dd>
+</dl>
+<p>])</p>
+<p>data = CoraFull()
+model = …</p>
+<dl>
+<dt>for epoch in range(10): # begin training loop</dt><dd><p>new_data = node_aug(data) # apply the node augmentation(s)
+new_data = edge_aug(new_data) # apply the edge augmentation(s)</p>
+<p>x, y = new_data.x, new_data.y
+…</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.Compose">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">Compose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transforms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#Compose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.Compose" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.Compose.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transforms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#Compose.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.Compose.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.Compose.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#Compose.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.Compose.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.Compose.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.Compose.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.LimbDrop">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">LimbDrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#LimbDrop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.LimbDrop" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.LimbDrop.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#LimbDrop.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.LimbDrop.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.LimbDrop.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#LimbDrop.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.LimbDrop.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Ex:
+d = dau.example_data_obj()
+dau.NodeDrop(p = 0.5)(d,verbose =True)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.LimbDrop.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.LimbDrop.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeDrop">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">NodeDrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeDrop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeDrop" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeDrop.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeDrop.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeDrop.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeDrop.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeDrop.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeDrop.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Ex:
+d = dau.example_data_obj()
+dau.NodeDrop(p = 0.5)(d,verbose =True)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeDrop.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeDrop.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureMask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">NodeFeatureMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeFeatureMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureMask" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureMask.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeFeatureMask.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureMask.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureMask.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeFeatureMask.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureMask.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureMask.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureMask.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureNoise">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">NodeFeatureNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeFeatureNoise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureNoise" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureNoise.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeFeatureNoise.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureNoise.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureNoise.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#NodeFeatureNoise.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureNoise.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.NodeFeatureNoise.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.NodeFeatureNoise.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.compose_augmentation">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">compose_augmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">augmentations</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#compose_augmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.compose_augmentation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.drop_limbs">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">drop_limbs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limb_map_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pool1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#drop_limbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.drop_limbs" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To drop limbs randomly from a dataset</p>
+<p>Pseudocode:
+1) Get a mask for the limbs
+2) Turn the mask of the limbs into a mask for the nodes
+3) Use drop_nodes function</p>
+<p>Ex:
+new_d = dau.drop_limbs(</p>
+<blockquote>
+<div><p>data = dau.example_data_obj(),
+verbose = True,
+p = 0.3</p>
+</div></blockquote>
+<p>)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.drop_nodes">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">drop_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_attributes_to_adjust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#drop_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.drop_nodes" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: to delete certain nodes from a dataset
+based on a mask</p>
+<p>Pseudocode:
+1) Generate the mask if not defined
+2) Get the node_idx of the mask
+3) Generate vector of the new node ids</p>
+<p>4) Find the new edges by dropping the edges with the nodes
+and then finding the new edge</p>
+<p>Ex:
+from torch_geometric.data import Data
+import numpy as np
+from pytorch_tools import geometric_dataset_utils as gdu</p>
+<p>d = dau.example_data_obj()
+new_d = dau.drop_nodes(</p>
+<blockquote>
+<div><p>d,
+p=0.5,
+verbose = True,
+#node_attributes_to_adjust=pool_attributes_affected_by_nodes</p>
+</div></blockquote>
+<p>)</p>
+<p>Ex: With a prescribed mask</p>
+<p>d = dau.example_data_obj()
+new_d = dau.drop_nodes(</p>
+<blockquote>
+<div><p>d,
+mask = torch.tensor([0,0,1,0,0,0],dtype=torch.bool),
+p=0.5,
+verbose = True,
+#node_attributes_to_adjust=pool_attributes_affected_by_nodes</p>
+</div></blockquote>
+<p>)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.mask_addition_if_totally_eliminated">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">mask_addition_if_totally_eliminated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#mask_addition_if_totally_eliminated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.mask_addition_if_totally_eliminated" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To come up with a mask indicating
+what positions need to be fixed in order for the
+mask not to totally eliminated a batch</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.pool_idx_stacked">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">pool_idx_stacked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pool1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_n_limbs_for_neuron</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_adjustment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#pool_idx_stacked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.pool_idx_stacked" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To generate a vector that represents the
+mapping of nodes to unique limbs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.data_augmentation_utils.set_ptr">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.data_augmentation_utils.</span></span><span class="sig-name descname"><span class="pre">set_ptr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ptr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/data_augmentation_utils.html#set_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.data_augmentation_utils.set_ptr" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: to compute the new ptr
+if a batch is readjusted</p>
+</dd></dl>
+
 </section>
 <section id="module-pytorch_tools.dgl_utils">
 <span id="pytorch-tools-dgl-utils-module"></span><h2>pytorch_tools.dgl_utils module<a class="headerlink" href="#module-pytorch_tools.dgl_utils" title="Permalink to this heading"></a></h2>
@@ -277,8 +576,189 @@ binary classification</p>
 </dd></dl>
 
 </section>
-<section id="pytorch-tools-geometric-dataset-utils-module">
-<h2>pytorch_tools.geometric_dataset_utils module<a class="headerlink" href="#pytorch-tools-geometric-dataset-utils-module" title="Permalink to this heading"></a></h2>
+<section id="module-pytorch_tools.geometric_dataset_utils">
+<span id="pytorch-tools-geometric-dataset-utils-module"></span><h2>pytorch_tools.geometric_dataset_utils module<a class="headerlink" href="#module-pytorch_tools.geometric_dataset_utils" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.DataHierarchical">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">DataHierarchical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#DataHierarchical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.DataHierarchical" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.DataHierarchical.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#DataHierarchical.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.DataHierarchical.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.closest_neighbors_in_embedding_df">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">closest_neighbors_in_embedding_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neighbors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotting_func_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plot_proofread_neuron'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotting_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#closest_neighbors_in_embedding_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.closest_neighbors_in_embedding_df" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To find the n_neighbors
+closest to a certain embedding</p>
+<p>Pseudocode:</p>
+<ol class="arabic simple">
+<li><p>Extract the matrix</p></li>
+</ol>
+<p>Ex:
+from meshAfterParty.dataInterfaceMinnie65 import data_interface as hdju_m65
+closest_neighbors_in_embedding_df(</p>
+<blockquote>
+<div><p>df = data_source_df,
+data_name = “864691134884769786_0”,
+n_neighbors = 5,
+verbose = True,
+data_fetcher = hdju_m65,
+plot = True
+)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.drop_limbs">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">drop_limbs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limb_map_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pool1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#drop_limbs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.drop_limbs" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To drop limbs randomly from a dataset</p>
+<p>Pseudocode:
+1) Get a mask for the limbs
+2) Turn the mask of the limbs into a mask for the nodes
+3) Use drop_nodes function</p>
+<p>Ex:
+new_d = gdu.drop_limbs(</p>
+<blockquote>
+<div><p>data = gdu.example_data_obj(),
+verbose = True,
+p = 0.3</p>
+</div></blockquote>
+<p>)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.drop_nodes">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">drop_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_attributes_to_adjust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#drop_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.drop_nodes" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: to delete certain nodes from a dataset
+based on a mask</p>
+<p>Pseudocode:
+1) Generate the mask if not defined
+2) Get the node_idx of the mask
+3) Generate vector of the new node ids</p>
+<p>4) Find the new edges by dropping the edges with the nodes
+and then finding the new edge</p>
+<p>Ex:
+from torch_geometric.data import Data
+import numpy as np
+from pytorch_tools import geometric_dataset_utils as gdu</p>
+<p>d = gdu.example_data_obj()
+new_d = gdu.drop_nodes(</p>
+<blockquote>
+<div><p>d,
+p=0.5,
+verbose = True,
+#node_attributes_to_adjust=pool_attributes_affected_by_nodes</p>
+</div></blockquote>
+<p>)</p>
+<p>Ex: With a prescribed mask</p>
+<p>d = gdu.example_data_obj()
+new_d = gdu.drop_nodes(</p>
+<blockquote>
+<div><p>d,
+mask = torch.tensor([0,0,1,0,0,0],dtype=torch.bool),
+p=0.5,
+verbose = True,
+#node_attributes_to_adjust=pool_attributes_affected_by_nodes</p>
+</div></blockquote>
+<p>)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.example_data_obj">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">example_data_obj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#example_data_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.example_data_obj" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.int_label_map">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">int_label_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#int_label_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.int_label_map" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.load_data">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_extraction_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnn_task_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gnn_task'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_filepath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_standardization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_int_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dense_adj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_delete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed_data_folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_prior_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_append_to_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_process_labeled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_label_int_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.load_data" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: Will load the data for processing using the GNN models</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.load_data_hierarchical">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">load_data_hierarchical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed_data_folder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gnn_task_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gnn_task'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_delete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int_label_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dense_adj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_prior_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_process_labeled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_to_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_label_int_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#load_data_hierarchical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.load_data_hierarchical" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: Will load the data for processing using the GNN models</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.normalization_df">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">normalization_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_extraction_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#normalization_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.normalization_df" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.normalization_df_hierarchical">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">normalization_df_hierarchical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_name_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#normalization_df_hierarchical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.normalization_df_hierarchical" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To create the normalization dataframe
+for all of the pooling layers</p>
+<p>Pseudocode:
+1)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.normalize_and_filter_x_columns">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">normalize_and_filter_x_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_keep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_delete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#normalize_and_filter_x_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.normalize_and_filter_x_columns" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To normalize and filter the
+x features</p>
+<p>Pseudocode:
+1) Get the columns want to normalize
+2) For each row in the df:</p>
+<blockquote>
+<div><p>For each column to normalize:
+a. Get the dataframe with x and turn into dataframe
+b. Filter for columns you want
+c. Normalize the columns using the normalization dataframe
+d. Add the new data to a dataframe</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.pool_array_names">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">pool_array_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#pool_array_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.pool_array_names" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.pool_idx_stacked">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">pool_idx_stacked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pool1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_n_limbs_for_neuron</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_adjustment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#pool_idx_stacked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.pool_idx_stacked" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To generate a vector that represents the
+mapping of nodes to unique limbs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.pytorch_data_hierarchical_from_single_data">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">pytorch_data_hierarchical_from_single_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_int_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_array_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_to_include</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#pytorch_data_hierarchical_from_single_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.pytorch_data_hierarchical_from_single_data" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To convert a dictionary with
+the data for one observation into a pytorch
+geometric data object</p>
+<p>Pseudocode:
+1) Get all of the pool attributes</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.set_ptr">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">set_ptr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ptr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#set_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.set_ptr" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: to compute the new ptr
+if a batch is readjusted</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.x_column_feature_name">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">x_column_feature_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_name_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#x_column_feature_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.x_column_feature_name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.geometric_dataset_utils.x_columns">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.geometric_dataset_utils.</span></span><span class="sig-name descname"><span class="pre">x_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_name_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_to_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/geometric_dataset_utils.html#x_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.geometric_dataset_utils.x_columns" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-pytorch_tools.geometric_models">
 <span id="pytorch-tools-geometric-models-module"></span><h2>pytorch_tools.geometric_models module<a class="headerlink" href="#module-pytorch_tools.geometric_models" title="Permalink to this heading"></a></h2>
@@ -1179,8 +1659,69 @@ a pool tensor</p>
 <dd></dd></dl>
 
 </section>
-<section id="pytorch-tools-hierarchical-utils-module">
-<h2>pytorch_tools.hierarchical_utils module<a class="headerlink" href="#pytorch-tools-hierarchical-utils-module" title="Permalink to this heading"></a></h2>
+<section id="module-pytorch_tools.hierarchical_utils">
+<span id="pytorch-tools-hierarchical-utils-module"></span><h2>pytorch_tools.hierarchical_utils module<a class="headerlink" href="#module-pytorch_tools.hierarchical_utils" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pytorch_tools.hierarchical_utils.</span></span><span class="sig-name descname"><span class="pre">GCNHierarchicalClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_num_node_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_channels_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_channels_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_node_features_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bn_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bn_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_running_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_pool_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_pool_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'node_weight'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_layer_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_layer_outputs_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'concatenate'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge_weight'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_self_loops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_p_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_p_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_lin_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">super_node_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_pool_after_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_pool_after_pool1_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_clf_n_layers_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_clf_n_layers_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_max_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/hierarchical_utils.html#GCNHierarchicalClassifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>Purpose: To run a GCN network that
+has a middle step that hierarchically pools
+nodes together and runs a classification on them
+and returns both the overall classification and the node classification</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_num_node_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_num_classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_channels_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_hidden_channels_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_node_features_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bn_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_bn_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_running_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_pool_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_pool_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'node_weight'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_layer_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_layer_outputs_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'concatenate'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'edge_weight'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_self_loops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_p_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_p_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_lin_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">super_node_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_pool_after_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_pool_after_pool1_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_clf_n_layers_pool0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_clf_n_layers_pool1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_max_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/hierarchical_utils.html#GCNHierarchicalClassifier.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_encode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_conv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/hierarchical_utils.html#GCNHierarchicalClassifier.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.encode" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To pass dta through all of the gcn layers
+and classifier layers and return the following:</p>
+<p>Pseudocode:
+1) pool0 GCN layer
+2) Pool the nodes together into limbs
+2) Feed into classifier (save the outputs and y)
+3) concatenate x_pool1 to features
+4) pool1 GCN layer
+5) Pool the nodes together
+6) Pass through classifier</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/hierarchical_utils.html#GCNHierarchicalClassifier.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#pytorch_tools.hierarchical_utils.GCNHierarchicalClassifier.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.forward_pass">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.hierarchical_utils.</span></span><span class="sig-name descname"><span class="pre">forward_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_pool1_weight_by_pool2_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_pool1_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_pool2_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_batches_per_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nll_loss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmentations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_return_1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_return_2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict_for_embed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/hierarchical_utils.html#forward_pass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.hierarchical_utils.forward_pass" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: Want to generate y_pred/y_true or dataframes for</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.hierarchical_utils.hierarchical_loss">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.hierarchical_utils.</span></span><span class="sig-name descname"><span class="pre">hierarchical_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_pool1_weight_by_pool2_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_pool1_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_pool2_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_separate_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/hierarchical_utils.html#hierarchical_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.hierarchical_utils.hierarchical_loss" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-pytorch_tools.loss_utils">
 <span id="pytorch-tools-loss-utils-module"></span><h2>pytorch_tools.loss_utils module<a class="headerlink" href="#module-pytorch_tools.loss_utils" title="Permalink to this heading"></a></h2>
@@ -1545,8 +2086,21 @@ sort_by: (optional str) column name to sort by.</p>
 <dd></dd></dl>
 
 </section>
-<section id="pytorch-tools-train-test-geometric-utils-module">
-<h2>pytorch_tools.train_test_geometric_utils module<a class="headerlink" href="#pytorch-tools-train-test-geometric-utils-module" title="Permalink to this heading"></a></h2>
+<section id="module-pytorch_tools.train_test_geometric_utils">
+<span id="pytorch-tools-train-test-geometric-utils-module"></span><h2>pytorch_tools.train_test_geometric_utils module<a class="headerlink" href="#module-pytorch_tools.train_test_geometric_utils" title="Permalink to this heading"></a></h2>
+<p>Purpose: To store functions that help with training and testing</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.train_test_geometric_utils.forward_pass">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.train_test_geometric_utils.</span></span><span class="sig-name descname"><span class="pre">forward_pass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_batches_per_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nll_loss'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmentations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features_to_return</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_dict_for_embed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/train_test_geometric_utils.html#forward_pass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.train_test_geometric_utils.forward_pass" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pytorch_tools.train_test_geometric_utils.forward_pass_embed_df">
+<span class="sig-prename descclassname"><span class="pre">pytorch_tools.train_test_geometric_utils.</span></span><span class="sig-name descname"><span class="pre">forward_pass_embed_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_loader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data_sources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pytorch_tools/train_test_geometric_utils.html#forward_pass_embed_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pytorch_tools.train_test_geometric_utils.forward_pass_embed_df" title="Permalink to this definition"></a></dt>
+<dd><p>Purpose: To return a dataframe with the embeddings
+and the names and soruce if specified</p>
+</dd></dl>
+
 </section>
 <section id="module-pytorch_tools.training_layer_utils">
 <span id="pytorch-tools-training-layer-utils-module"></span><h2>pytorch_tools.training_layer_utils module<a class="headerlink" href="#module-pytorch_tools.training_layer_utils" title="Permalink to this heading"></a></h2>
