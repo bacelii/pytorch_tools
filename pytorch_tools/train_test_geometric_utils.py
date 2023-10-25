@@ -298,8 +298,8 @@ from . import evaluation_utils as evu
 from . import parameters_utils as paru
 from . import tensor_utils as tenu
 
-#--- from python_tools ---
-from python_tools import general_utils as gu
-from python_tools import pandas_utils as pu
+#--- from datasci_tools ---
+from datasci_tools import general_utils as gu
+from datasci_tools import pandas_utils as pu
 
 from . import train_test_geometric_utils as ttu

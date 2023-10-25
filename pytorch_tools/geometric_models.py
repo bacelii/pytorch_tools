@@ -1807,5 +1807,5 @@ class TreeLSTM(nn.Module):
 from . import dgl_utils as dglu
 from . import geometric_tensor_utils as gtu
 
-#--- from python_tools ---
-from python_tools import numpy_utils as nu
+#--- from datasci_tools ---
+from datasci_tools import numpy_utils as nu

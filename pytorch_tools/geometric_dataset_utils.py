@@ -15,7 +15,7 @@ import torch
 import torch_geometric.transforms as T
 
 
-#python_tools modules
+#datasci_tools modules
 
 #neuron_morphology_tools modules
 
@@ -1275,14 +1275,14 @@ from . import preprocessing_utils as pret
 from . import tensor_utils as tenu
 
 #--- from neuron_morphology_tools ---
-from neuron_morphology_tools import neuron_nx_io as nxio
+from neuron_morphology_tools from neurd import neuron_nx_io as nxio
 
-#--- from python_tools ---
-from python_tools import networkx_utils as xu
-from python_tools import numpy_utils as nu
-from python_tools import pandas_utils as pu
-from python_tools import regex_utils as reu
-from python_tools import system_utils as su
-from python_tools.tqdm_utils import tqdm
+#--- from datasci_tools ---
+from datasci_tools import networkx_utils as xu
+from datasci_tools import numpy_utils as nu
+from datasci_tools import pandas_utils as pu
+from datasci_tools import regex_utils as reu
+from datasci_tools import system_utils as su
+from datasci_tools.tqdm_utils import tqdm
 
 from . import geometric_dataset_utils as gdu

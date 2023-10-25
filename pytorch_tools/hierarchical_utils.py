@@ -920,7 +920,7 @@ from . import tensor_utils as tenu
 from .geometric_models import ClassifierBase
 from .geometric_models_overload import GCNConv
 
-#--- from python_tools ---
-from python_tools import numpy_utils as nu
+#--- from datasci_tools ---
+from datasci_tools import numpy_utils as nu
 
 from . import hierarchical_utils as hru

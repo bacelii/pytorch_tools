@@ -56,7 +56,7 @@ def from_networkx(
     return new_G
 
     
-#--- from python_tools ---
-from python_tools import networkx_utils as xu
+#--- from datasci_tools ---
+from datasci_tools import networkx_utils as xu
 
 from . import dgl_utils as dglu
