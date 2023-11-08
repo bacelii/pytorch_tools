@@ -20,14 +20,29 @@ def get_links():
         #"git+https://github.com/bacelii/machine_learning_tools.git"
     ]
 
+def get_long_description(filepath='README.md'):
+    try:
+        import pypandoc
+        long_description = pypandoc.convert_file(filepath, 'rst') 
+    except:
+        print("\n\n\n****Need to install pypandoc (and if havent done so install apt-get install pandoc) to make long description clean****\n\n\n")
+        
+        long_description = Path("README.md").read_text()
+        
+    return long_description
 
 
 setup(
     name='pytorch_tools', # the name of the package, which can be different than the folder when using pip instal
     version='1.0.0',
-    description='',
-    author='Brendan Celii',
-    author_email='brendanacelii',
+    description='Utility modules for pytorch geometric and pytorch models',
+    long_description=get_long_description(),
+	project_urls={
+	    'Source':"https://github.com/reimerlab/graph_tools",
+	    'Documentation':"https://reimerlab.github.io/graph_tools/",
+	},
+	author='Brendan Celii',
+	author_email='brendanacelii@gmail.com',
     packages=find_packages(),  #teslls what packages to be included for the install
     install_requires=get_install_requires(), #external packages as dependencies
     dependency_links = get_links(),

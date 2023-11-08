@@ -10,6 +10,6 @@ tensorboard>=2.6.0
 #pip3 install torch-geometric
 ipython
 ipython_genutils
-datasci_tools @ git+https://git@github.com/bacelii/datasci_tools.git
-neuron_morphology_tools @ git+https://git@github.com/bacelii/neuron_morphology_tools.git
+datasci-stdlib-tools>=1.0.0
+neuron_morphology_tools>=1.0.0
 
